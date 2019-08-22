@@ -10,6 +10,7 @@
 #include <pwd.h>
 #include <dirent.h>
 #include <errno.h>
+#include <grp.h>
 typedef long long ll;
 
 extern int errno; 
@@ -43,4 +44,5 @@ char past_present_directory[65536];
 char *buffer;
 
 ll lengthofhomedirectory;
+ll lengthofpresentdictionary;
 ll NUM_COMMANDS ;

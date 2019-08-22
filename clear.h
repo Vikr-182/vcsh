@@ -5,5 +5,5 @@ void clear(){
 }
 
 void reset(){
-    printf(ANSI_RESET);
+    printf(ANSI_RESET_SCREEN);
 }

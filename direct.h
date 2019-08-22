@@ -22,15 +22,16 @@ void redirect(char *argv)
         line = strtok(NULL, " ");
     }
     ll n = 0;
-    for (ll n = 0; n < i; n++)
+    /*  for (ll n = 0; n < i; n++)
     {
         printf("|%s|",tokens[n]);
     }
-    printf("\n");
-    // printf("|%s|", tokens[n]);
+    printf("\n");*/
+    printf("|%s|", tokens[n]);
     if (tokens[n][0] == 'l' && tokens[n][1] == 's')
     {
         // Execute ls
+        ls_vcsh(i - 1, tokens);
     }
     else if (tokens[n][0] == 'c' && tokens[n][1] == 'd')
     {
@@ -62,14 +63,23 @@ void redirect(char *argv)
         // Execute clear
         clear();
     }
-     else if (tokens[n][0] == 'r' && tokens[n][1] == 'e' && tokens[n][2] == 's' && tokens[n][3] == 'e' && tokens[n][4] == 't')
+    else if (tokens[n][0] == 'r' && tokens[n][1] == 'e' && tokens[n][2] == 's' && tokens[n][3] == 'e' && tokens[n][4] == 't')
     {
         // Execute reset
         reset();
     }
+    if (tokens[n][0] == 'p' && tokens[n][1] == 'w' && tokens[n][2] == 'd')
+    {
+        // printf("hi");
+        // Executre pwd
+        pwd_vcsh();
+    }
+ /*   else{
+        execvp(tokens[0],tokens);
+    }*/
 }
 
-void shell_loop()
+ll shell_loop()
 {
     char *c = getcwd(homedirectory, sizeof(homedirectory));
     if (!c)
@@ -111,9 +121,16 @@ void shell_loop()
                     present_directory[n] = PP[n];
                 }
                 present_directory[strlen(present_directory) - lengthofhomedirectory + 1] = '\0';
+                lengthofpresentdictionary = strlen(present_directory);
+                printf("length is %lld\n", lengthofpresentdictionary);
+            }
+            else
+            {
+                lengthofpresentdictionary = strlen(present_directory);
             }
         }
-
+        lengthofpresentdictionary = strlen(present_directory);
+       
         // DISPLAY PROMPT
         prompt_display();
 
@@ -125,10 +142,10 @@ void shell_loop()
 
         for (ll n = 0; n <= NUM_COMMANDS; n++)
         {
-            // printf("%s \n",totalcommands[n]);
-            redirect(totalcommands[n]);
-            printf("\n\n");
-            // free(totalcommands[n]);
+                redirect(totalcommands[n]);
+                printf("\n\n");
+
         }
     }
+    return EXIT_FAILURE;
 }
