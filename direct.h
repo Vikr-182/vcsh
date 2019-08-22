@@ -31,12 +31,8 @@ void redirect(char *argv)
 	}
 	printf("\n");
 	printf("|%s|", tokens[n]);
-	if (tokens[n][0] == 'l' && tokens[n][1] == 's')
-	{
-		// Execute ls
-		ls_vcsh(i - 1, tokens);
-	}
-	else if (tokens[n][0] == 'c' && tokens[n][1] == 'd')
+	
+	if (tokens[n][0] == 'c' && tokens[n][1] == 'd')
 	{
 		// Execute cd
 		cd_vcsh(tokens);
@@ -71,11 +67,40 @@ void redirect(char *argv)
 		// Execute reset
 		reset();
 	}
-	if (tokens[n][0] == 'p' && tokens[n][1] == 'w' && tokens[n][2] == 'd')
+
+	// Execute in child process only
+	int pid = fork();
+	if(pid==0)
+	{
+	if (tokens[n][0] == 'l' && tokens[n][1] == 's')
+	{
+		// Execute ls
+		ls_vcsh(i - 1, tokens);
+	}
+	else if (tokens[n][0] == 'p' && tokens[n][1] == 'w' && tokens[n][2] == 'd')
 	{
 		// printf("hi");
 		// Executre pwd
 		pwd_vcsh();
+	}
+	else{
+		// Execute command 
+		if(execvp(tokens[0],tokens)==-1){
+			perror("Error executing or wrong command\n");
+		}
+	}
+	}
+	else if(pid<0)
+	{
+		perror("Error forking");
+	}
+	else
+	{
+		int status ;
+		do
+		{
+			waitpid(pid,&status,WUNTRACED);
+		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
 	/*   else{
 	     execvp(tokens[0],tokens);

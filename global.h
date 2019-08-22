@@ -46,3 +46,5 @@ char *buffer;
 ll lengthofhomedirectory;
 ll lengthofpresentdictionary;
 ll NUM_COMMANDS ;
+// ll background = 0;
+// ll foreground = 0;

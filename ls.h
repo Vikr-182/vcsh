@@ -228,6 +228,7 @@ void ls_vcsh(int argc, char *argv[])
 	// printf("%lld %lld\n", listing, hidden);
 	ll a = chdir(path);
 	printf("%s\n", present_directory);
+	ll totalnum = 0;
 	while (de || !cnt)
 	{
 		cnt++;
@@ -259,6 +260,7 @@ void ls_vcsh(int argc, char *argv[])
 				de = readdir(p);
 				continue;
 			}
+			totalnum += h.st_nlink;
 			if (listing && !hidden)
 			{
 				if (de->d_name[0] != '.')
@@ -400,6 +402,10 @@ void ls_vcsh(int argc, char *argv[])
 		de = readdir(p);
 	}
 	printf("\n");
+	if(listing)
+	{
+		printf("total\t%lld\n",totalnum/2);
+	}
 	char comm[BUFFER_SIZE + 2];
 	if(present_directory[0]=='~'){
 		for (ll n = 0; n < lengthofhomedirectory; n++)
