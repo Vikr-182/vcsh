@@ -84,11 +84,11 @@ void ls_vcsh(int argc, char *argv[])
 	int listing = 0;
 	int hidden = 0;
 	struct dirent *de;
-	for (ll n = 0; n <= argc; n++)
+	/*for (ll n = 0; n <= argc; n++)
 	{
 		printf("|%s|", argv[n]);
 	}
-	printf("ho");
+	printf("ho");*/
 	ll *array = (ll *)calloc(sizeof(ll), MAX_TOKENS);
 	for (ll i = 1; i <= argc; i++)
 	{
@@ -124,18 +124,18 @@ void ls_vcsh(int argc, char *argv[])
 		printf("\nPlease provide only 2 paths\n");
 	}
 	char *path = (char *)malloc(sizeof(char) * BUFFER_SIZE);
-	printf("||_<>|%s|\n",homedirectory);
-	printf("%lld %lld\n", f, find);
+	// printf("||_<>|%s|\n",homedirectory);
+	// printf("%lld %lld\n", f, find);
 	if (f)
 	{
 		//No path provided ls in current working directory
-		printf("hi %s %d\n",present_directory,lengthofpresentdictionary);
+		// printf("hi %s %d\n",present_directory,lengthofpresentdictionary);
 		for (ll n = 0; n < lengthofpresentdictionary; n++)
 		{
 			path[n] = present_directory[n];
 		}
 		path[lengthofpresentdictionary] = '\0';
-		printf("-|%s|-\n",path);
+		// printf("-|%s|-\n",path);
 		if (path[0] == '~')
 		{
 			for (ll n = 0; n < lengthofhomedirectory; n++)
@@ -143,7 +143,7 @@ void ls_vcsh(int argc, char *argv[])
 				path[n] = homedirectory[n];
 			}
 			path[lengthofhomedirectory] = '/';
-			 printf("middle |%s|\n",path);
+			//  printf("middle |%s|\n",path);
 			for (ll n = 2; n < lengthofpresentdictionary; n++)
 			{
 				path[n - 2 + lengthofhomedirectory + 1] = present_directory[n];
@@ -151,7 +151,7 @@ void ls_vcsh(int argc, char *argv[])
 			path[lengthofpresentdictionary-2+1+lengthofhomedirectory] = '\0';
 		}
 		// printf("%s|\n",present_directory);
-		printf("%s|\n", path);
+		// printf("%s|\n", path);
 	}
 	else
 	{
@@ -167,7 +167,7 @@ void ls_vcsh(int argc, char *argv[])
 			{
 				path[n + lengthofhomedirectory + 2] = argv[find][n];
 			}
-			printf("%s|\n", path);
+			// printf("%s|\n", path);
 		}
 		else
 		{
@@ -176,7 +176,7 @@ void ls_vcsh(int argc, char *argv[])
 				path[n] = argv[find][n];
 			}
 			path[strlen(argv[find])] = '\0';
-			printf("%s|\n", path);
+			// printf("%s|\n", path);
 		}
 	}
 	ll invalid = 0;
@@ -184,7 +184,7 @@ void ls_vcsh(int argc, char *argv[])
 	{
 		if (array[n])
 		{
-			printf("%s ok\n", argv[n]);
+			// printf("%s ok\n", argv[n]);
 			if (argv[n][0] == '-' && argv[n][1] == 'l' && argv[n][2] != 'a')
 			{
 				listing = 1;
@@ -216,7 +216,7 @@ void ls_vcsh(int argc, char *argv[])
 		return;
 	}
 	// Parse argv[] to get the correct path
-	printf("yay %s\n",path);
+	// printf("yay %s\n",path);
 	DIR *p = opendir(path);
 	if (!p)
 	{
@@ -227,7 +227,7 @@ void ls_vcsh(int argc, char *argv[])
 	int cnt = 0;
 	// printf("%lld %lld\n", listing, hidden);
 	ll a = chdir(path);
-	printf("%s\n", present_directory);
+	// printf("%s\n", present_directory);
 	ll totalnum = 0;
 	while (de || !cnt)
 	{

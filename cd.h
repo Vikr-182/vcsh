@@ -6,11 +6,10 @@ ll cd_vcsh(char *argv[])
 	if (argv[2] != NULL)
 	{
 		printf("Please giive only 2 arguments\n");
-		if(argv[2] !=NULL)
-			printf("Yy %d\n",strlen(argv[2]));
 	}
 	if (argv[1] == NULL)
 	{
+		// printf("Yay %s\n",homedirectory);
 		int a = chdir(homedirectory);
 		if (a == -1)
 		{
@@ -55,8 +54,8 @@ ll cd_vcsh(char *argv[])
 
 		printf("|%s|\n", A);
 		// ll b = chdir(A);
-		ll b = chdir(homedirectory);
-		// printf("Yay %d\n", b);
+		ll b = chdir(A);
+		printf("Yay %d\n", b);
 		if (b == -1)
 		{
 			perror("Unaable to change directory");
@@ -74,9 +73,10 @@ ll cd_vcsh(char *argv[])
 	if (argv[1][0] == '-' && strlen(argv[1]) == 1)
 	{
 		// go back to previous directory
-		printf("%s\n",past_present_directory);
+		// printf("%s\n",past_present_directory);
 		ll g = chdir(past_present_directory);
-		if(g==-1){
+		if (g == -1)
+		{
 			perror("Error going back to past directory");
 			return EXIT_FAILURE;
 		}
@@ -101,36 +101,188 @@ ll cd_vcsh(char *argv[])
 	return 1;
 }
 
-void pwd_vcsh(){
+void pwd_vcsh()
+{
 	char A[65536];
 	char B[65536];
 
-	getcwd(A,sizeof(A));
+	getcwd(A, sizeof(A));
 	ll fg = 0;
 	// printf("|%s|\n",A);
-	if(strlen(A)>=strlen(homedirectory)){
+	if (strlen(A) >= strlen(homedirectory))
+	{
 		for (ll n = 0; n < lengthofhomedirectory; n++)
 		{
-			if(A[n]!=homedirectory[n]){
+			if (A[n] != homedirectory[n])
+			{
 				fg = 1;
 			}
 		}
 	}
-	else{
+	else
+	{
 		fg = 1;
 	}
-	if(!fg){
+	if (!fg)
+	{
 		B[0] = '~';
 		B[1] = '/';
 		// printf("Hi\n");
-		for (ll n = 2; n < strlen(A)-strlen(homedirectory)+1; n++)
+		for (ll n = 2; n < strlen(A) - strlen(homedirectory) + 1; n++)
 		{
-			B[n] = A[n+lengthofhomedirectory-1];
+			B[n] = A[n + lengthofhomedirectory - 1];
 		}
-		B[strlen(A)-strlen(homedirectory)+1] = '\0';
-		printf("%s\n",B);
+		B[strlen(A) - strlen(homedirectory) + 1] = '\0';
+		printf("%s\n", B);
 	}
-	else{
-		printf("%s\n",A);
+	else
+	{
+		printf("%s\n", A);
+	}
+}
+
+void clear()
+{
+	printf(ANSI_CLEAR_SCREEN);
+}
+
+void reset()
+{
+	printf(ANSI_RESET_SCREEN);
+}
+
+void echo_vcsh(ll argc, char *argv[])
+{
+	ll nflag = 0;
+	// printf("ha\n");
+	for (ll i = 1; i < argc + 1; i++)
+	{
+		// printf("%lld\n",i);
+		if (argv[i][0] == '-' && argv[i][1] == 'n')
+		{
+			nflag = 0;
+		}
+	}
+	ll start = 0;
+	ll fin = 0;
+	ll startind = 0;
+	ll startarr = 0;
+	ll findind = 0;
+	ll findarr = 0;
+	char majorstring[BUFFER_SIZE];
+	ll ind = 0;
+	;
+	for (ll i = 1; i < argc + 1; i++)
+	{
+		for (ll j = 0; j < strlen(argv[i]); j++)
+		{
+			majorstring[ind++] = argv[i][j];
+		}
+		majorstring[ind++] = ' ';
+	}
+/*	for (ll i = 0; i < ind; i++)
+	{
+		printf("%c ", majorstring[i]);
+	}
+*/
+	ll dollaraaya = 0;
+	for (ll i = 0; i < ind;)
+	{
+		if (!start && majorstring[i] == '$')
+		{
+			dollaraaya = 1;
+		}
+		// printf("%lld %lld %lld %c\n",i,start,dollaraaya,majorstring[i]);
+		if (!start && majorstring[i] == '\"')
+		{
+			start = 1;
+			startind = i + 1;
+			i++;
+			continue;
+		}
+		else if (start && majorstring[i] == '\"')
+		{
+			start = 0;
+			findind = i - 1;
+
+//				Print from i->j whatever it is
+			for (ll h = startind; h <= findind; )
+			{
+				ll dollar = 0;
+				ll p;
+				ll markedarray[3000];
+				char H[2000];
+				ll here = 0;
+				if (majorstring[h] == '$')
+				{
+					here = h;
+					ll ij;
+					for (ij = h + 1; ij <= findind && majorstring[ij] != ' '; ij++)
+					{
+						H[ij - h - 1] = majorstring[ij];
+					}
+					H[ij-h-1] = '\0';
+					dollar = 1;
+					char *b = getenv(H);
+					if (b && dollar)
+
+						printf("%s ", b);
+					else if (dollar)
+					{
+						printf("\t");
+					}
+					h = ij;
+				}
+				else
+				{
+					printf("%c", majorstring[h]);
+					h++;
+				}
+			}
+			i = findind+2;
+			continue;
+		}
+		else if (!start && majorstring[i] != '\"' && !dollaraaya)
+		{
+			printf("%c", majorstring[i]);
+			i++;
+			continue;
+		}
+		else if (!start && majorstring[i] != '\"' && dollaraaya)
+		{
+			dollaraaya = 0;
+			ll ij;
+			char T[300];
+			for (ij = i + 1; ij < ind && majorstring[ij] != ' '; ij++)
+			{
+				T[ij - i - 1] = majorstring[ij];
+			}
+			
+			T[ij-i-1] = '\0';
+			
+			i = ij;
+			char *b = getenv(T);
+			if (b)
+
+				printf("%s ", b);
+			else
+			{
+				printf("\t");
+			}
+			continue;
+		}
+		else if(!start && majorstring[i]!='$' && !dollaraaya)
+		{
+			i++;
+			continue;
+		}
+		else{
+			i++;
+		}
+	}
+
+	if (!nflag)
+	{
+		printf("\n");
 	}
 }
