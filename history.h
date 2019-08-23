@@ -1,50 +1,40 @@
 #include "global.h"
 
-void history_vcsh(char *argv[])
+void history_vcsh(int argc, char *argv, ll flag)
 {
-    // printf("HI");
-    if(argv[2]!=NULL){
-        printf("Please provide only 2 arguments\n");
-    }
-    
-    ll power = 1;
-    ll total = 0;
-    for (ll i = 0; i < strlen(argv[1]); i++)
+    if (flag == 0)
     {
-        printf("|%c||",argv[1][i]);
-    }
-    ll num = 2;
-    
-    if(argv[1]==NULL){
-        num = 20;
-        printf("laal\n");
-    }
-    else
-    {
-        for (ll i = 0; i < strlen(argv[1]); i++)
+        char HISTORY[3000];
+        for (ll i = 0; i < lengthofhomedirectory; i++)
         {
-            total += power*(argv[1][strlen(argv[1])-1-i]-'0');
-            power*= 10;
+            HISTORY[i] = homedirectory[i];
         }
-        
+        ll o = lengthofhomedirectory + 1;
+        HISTORY[o - 1] = '/';
+        HISTORY[o] = '.';
+        HISTORY[o + 1] = 'v';
+        HISTORY[o + 2] = 'c';
+        HISTORY[o + 3] = 's';
+        HISTORY[o + 4] = 'h';
+        HISTORY[o + 5] = '_';
+        HISTORY[o + 6] = 'h';
+        HISTORY[o + 7] = 'i';
+        HISTORY[o + 8] = 's';
+        HISTORY[o + 9] = 't';
+        HISTORY[o + 10] = 'o';
+        HISTORY[o + 11] = 'r';
+        HISTORY[o + 12] = 'y';
+        HISTORY[o + 13] = '\0';
+        printf("|%s|path\n", HISTORY);
+        FILE *fd = fopen(HISTORY, "a+");
+        if (fd == 0)
+        {
+            printf("Can't open file\n");
+        }
+
+//          Put command into history file
+        fputs(buffer,fd);
+        fputs("\n", fd);
+
     }
-    num = total;
-    // printf("%lld ok \n",total);
-    ll curr = commandnumber;
-    ll diff = 0;
-    char lol[20][500];
-    while (HISTORY[curr] && diff <= num)
-    {
-        printf("%s\n",HISTORY[curr]);
-        strcpy(lol[diff],HISTORY[curr]);
-        curr = curr - 1;
-        curr = curr + 20;
-        curr = curr % 20;
-        diff++;
-    }
-    for (ll n = 0; n < diff; n++)
-    {
-        printf("%s\n",lol[diff-n-1]);
-    }
-    
 }

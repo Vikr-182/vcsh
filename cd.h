@@ -55,7 +55,7 @@ ll cd_vcsh(char *argv[])
 		printf("|%s|\n", A);
 		// ll b = chdir(A);
 		ll b = chdir(A);
-		printf("Yay %d\n", b);
+		// printf("Yay %d\n", b);
 		if (b == -1)
 		{
 			perror("Unaable to change directory");
