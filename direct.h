@@ -79,6 +79,7 @@ void redirect(char *argv)
 			F[ind++] = ' ';
 		}
 		F[ind] = '\0';
+		// printf("%s\n",F);
 		history_vcsh(i,F,1);
 	}
 	else if (!strcmp(tokens[n],"clear"))
@@ -221,7 +222,7 @@ ll shell_loop()
 	HISTORYY[o + 11] = 'r';
 	HISTORYY[o + 12] = 'y';
 	HISTORYY[o + 13] = '\0';
-	
+	// printf("%s\n",HISTORYY);
 	while (1)
 	{
 		// 			SET PWD

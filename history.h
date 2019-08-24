@@ -9,7 +9,6 @@ void history_vcsh(int argc, char *argv, ll flag)
         {
             printf("Can't open .vcsh_history\n");
         }
-
         //          Put command into history file
         fputs(buffer, fd);
         fputs("\n", fd);
@@ -24,16 +23,18 @@ void history_vcsh(int argc, char *argv, ll flag)
         {
             perror("Can't open .vcsh_history");
         }
-        char **tokens = (char **)malloc(sizeof(char *) * MAX_TOKENS);
+        
+        char **tokens = (char **)malloc(sizeof(char *) * MAX_COMMANDS);
         for (ll o = 0; o < MAX_TOKENS; o++)
         {
             tokens[o] = NULL;
         }
-        char *line = (char *)malloc(sizeof(char) * (MAX_TOKENS));
+        char *line = (char *)malloc(sizeof(char) * (MAX_COMMANDS));
         line = strtok(argv, " ");
         ll i = 0;
         while (line != NULL)
         {
+            // tokens[i] = (char *)malloc(sizeof(char *)*BUFFER_SIZE);
             tokens[i++] = line;
             line = strtok(NULL, " ");
         }
@@ -51,6 +52,7 @@ void history_vcsh(int argc, char *argv, ll flag)
                 p *= 10;
             }
         }
+        
         ll cnt = 0;
         size_t len;
         char *u = NULL;
@@ -60,7 +62,8 @@ void history_vcsh(int argc, char *argv, ll flag)
         {
             final = 10;
         }
-        char BUF[BUFFER_SIZE][BUFFER_SIZE];
+        
+        char BUF[512][512];
         while (a != -1)
         {
             strcpy(BUF[cnt], u);
@@ -69,7 +72,7 @@ void history_vcsh(int argc, char *argv, ll flag)
         }
         for (ll l = cnt - final; l < cnt; l++)
         {
-            printf("%s\n", BUF[l]);
+            printf("%s", BUF[l]);
         }
         fclose(fd);
     }
