@@ -4,37 +4,73 @@ void history_vcsh(int argc, char *argv, ll flag)
 {
     if (flag == 0)
     {
-        char HISTORY[3000];
-        for (ll i = 0; i < lengthofhomedirectory; i++)
-        {
-            HISTORY[i] = homedirectory[i];
-        }
-        ll o = lengthofhomedirectory + 1;
-        HISTORY[o - 1] = '/';
-        HISTORY[o] = '.';
-        HISTORY[o + 1] = 'v';
-        HISTORY[o + 2] = 'c';
-        HISTORY[o + 3] = 's';
-        HISTORY[o + 4] = 'h';
-        HISTORY[o + 5] = '_';
-        HISTORY[o + 6] = 'h';
-        HISTORY[o + 7] = 'i';
-        HISTORY[o + 8] = 's';
-        HISTORY[o + 9] = 't';
-        HISTORY[o + 10] = 'o';
-        HISTORY[o + 11] = 'r';
-        HISTORY[o + 12] = 'y';
-        HISTORY[o + 13] = '\0';
-        printf("|%s|path\n", HISTORY);
-        FILE *fd = fopen(HISTORY, "a+");
+        FILE *fd = fopen(HISTORYY, "a+");
         if (fd == 0)
         {
-            printf("Can't open file\n");
+            printf("Can't open .vcsh_history\n");
         }
 
-//          Put command into history file
-        fputs(buffer,fd);
+        //          Put command into history file
+        fputs(buffer, fd);
         fputs("\n", fd);
+        fclose(fd);
+    }
+    else
+    {
 
+        //          Extract top num commands
+        FILE *fd = fopen(HISTORYY, "r");
+        if (!fd)
+        {
+            perror("Can't open .vcsh_history");
+        }
+        char **tokens = (char **)malloc(sizeof(char *) * MAX_TOKENS);
+        for (ll o = 0; o < MAX_TOKENS; o++)
+        {
+            tokens[o] = NULL;
+        }
+        char *line = (char *)malloc(sizeof(char) * (MAX_TOKENS));
+        line = strtok(argv, " ");
+        ll i = 0;
+        while (line != NULL)
+        {
+            tokens[i++] = line;
+            line = strtok(NULL, " ");
+        }
+        if (tokens[2] != NULL)
+        {
+            printf("Please do not provide multiple arguments\n");
+        }
+        ll p = 1;
+        ll num = 0;
+        if (tokens[1])
+        {
+            for (ll i = 0; i < strlen(tokens[1]); i++)
+            {
+                num += (tokens[1][strlen(tokens[1]) - 1 - i] - '0') * p;
+                p *= 10;
+            }
+        }
+        ll cnt = 0;
+        size_t len;
+        char *u = NULL;
+        ll a = getline(&u, &len, fd);
+        ll final = num > 10 ? 10 : num;
+        if (tokens[1] == NULL)
+        {
+            final = 10;
+        }
+        char BUF[BUFFER_SIZE][BUFFER_SIZE];
+        while (a != -1)
+        {
+            strcpy(BUF[cnt], u);
+            cnt++;
+            a = getline(&u, &len, fd);
+        }
+        for (ll l = cnt - final; l < cnt; l++)
+        {
+            printf("%s\n", BUF[l]);
+        }
+        fclose(fd);
     }
 }

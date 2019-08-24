@@ -2,12 +2,22 @@
 #include "ls.h"
 #include "prompt.h"
 #include "readline.h"
-#include "cd.h"
+#include "builtins.h"
 #include "clear.h"
 #include "history.h"
 #include "pinfo.h"
+#include "nightswatch.h"
 
-ll pressedkey = 0;
+
+// ll pressedkey = 0;
+
+void signal_handler(){
+	int pid = waitpid(-1,NULL,WNOHANG);
+	if(pid>0){
+		printf("Child successfully exited %d\n",pid);
+	}
+}
+
 void redirect(char *argv)
 {
 	if (!argv)
@@ -29,61 +39,56 @@ void redirect(char *argv)
 		line = strtok(NULL, " ");
 	}
 	ll n = 0;
-	/*for (ll n = 0; n < i; n++)
-	{
-		printf("|%s|", tokens[n]);
-	}
-	printf("\n");
-	printf("->|%s|<-", tokens[0]);*/
-	// int fd = open("history.txt",O_CREAT|O_RDWR);
-	
 
-	if (tokens[n][0] == 'c' && tokens[n][1] == 'd')
-	{
-		// 			Execute cd
-		cd_vcsh(tokens);
-		// history_vcsh(i-1,tokens,0);
-	}
-	else if (tokens[n][0] == 'e' && tokens[n][1] == 'c' && tokens[n][2] == 'h' && tokens[n][3] == 'o')
-	{
-		// 			Execute echo
-		echo_vcsh(i - 1, tokens);
-		// history_vcsh(i-1,tokens,0);
 
-	}
-	else if (tokens[n][0] == 'p' && tokens[n][1] == 'i' && tokens[n][2] == 'n' && tokens[n][3] == 'f' && tokens[n][4] == 'o')
+	if(!strcmp(tokens[n],"vcsh"))
 	{
-		// 			Execute pinfo
-		pinfo_vcsh(tokens);
-		// history_vcsh(i-1,tokens,0);
-
+		tokens[n] = (char *)malloc(sizeof(char)*10);
+		strcpy(tokens[n],"./a.out");		//			invoking shell	
 	}
-	else if (tokens[n][0] == 'p' && tokens[n][1] == 'w' && tokens[n][2] == 'd')
+	if (!strcmp(tokens[n],"cd"))
 	{
-		// 			Execute pwd
-		pwd_vcsh();
-		// history_vcsh(i-1,tokens,0);
-
+		cd_vcsh(tokens);					// 			execute cd
 	}
-	else if (tokens[n][0] == 'n' && tokens[n][1] == 'i' && tokens[n][2] == 'g' && tokens[n][3] == 'h' && tokens[n][4] == 't' && tokens[n][5] == 's' && tokens[n][6] == 'w' && tokens[n][7] == 'a' && tokens[n][8] == 't' && tokens[n][9] == 'c' && tokens[n][10] == 'h')
+	else if (!strcmp(tokens[n],"echo"))
 	{
-		// 			Execute nightswatch
+		echo_vcsh(i - 1, tokens);			// 			execute echo
 	}
-	else if (tokens[n][0] == 'h' && tokens[n][1] == 'i' && tokens[n][2] == 's' && tokens[n][3] == 't' && tokens[n][4] == 'o' && tokens[n][5] == 'r' && tokens[n][6] == 'y')
+	else if (!strcmp(tokens[n],"pinfo"))
 	{
-		// 			Execute history
-		// history_vcsh(i,tokens,1);
-		// history_vcsh(i-1,tokens,0);
-
+		pinfo_vcsh(tokens);					// 			execute cd
 	}
-	else if (tokens[n][0] == 'c' && tokens[n][1] == 'l' && tokens[n][2] == 'e' && tokens[n][3] == 'a' && tokens[n][4] == 'r')
+	else if (!strcmp(tokens[n],"pwd"))
 	{
-		// 			Execute clear
-		clear();
-		// history_vcsh(i-1,tokens,0);
-
+		pwd_vcsh();							// 			execute pwd
 	}
-	// 			Execute in child process only
+	else if (!strcmp(tokens[n],"nightswatch"))
+	{
+		nightswatch(tokens);				// 			execute nightswatch
+	}
+	else if (!strcmp(tokens[n],"history"))
+	{
+		char F[200];						// 			execute history
+		ll ind  = 0;
+		for (ll q = 0; q <i; q++)
+		{
+			for (ll p = 0; p < strlen(tokens[q]); p++)
+			{
+				F[ind++] = tokens[q][p];
+			}
+			F[ind++] = ' ';
+		}
+		F[ind] = '\0';
+		history_vcsh(i,F,1);
+	}
+	else if (!strcmp(tokens[n],"clear"))
+	{
+		clear();							// 			execute clear
+	}
+	else if(!strcmp(tokens[n],"quit"))
+	{
+		quit();								// 			execute exit
+	}
 	else
 	{
 		ll askedinbg = 0;
@@ -92,47 +97,39 @@ void redirect(char *argv)
 		{
 			if (tokens[n][0] == '&' && strlen(tokens[n]) == 1)
 			{
-				// 				Asked to execute in background
-				askedinbg = 1;
+				askedinbg = 1;				//			asked to execute in background
 				findind = n;
 			}
 		}
-		if (!askedinbg)
+		if(askedinbg)
 		{
-//			Execute in foreground
-			printf("->start");
+			for (ll j = findind; j < i; j++)
+			{
+				tokens[j] = NULL;
+			}
+			i = findind;
+		}
+		if (!askedinbg)						//			execute in foreground
+		{
 			int pid = fork();
 			if (pid == 0)
 			{
-				if (tokens[n][0] == 'l' && tokens[n][1] == 's')
+				if (!strcmp(tokens[n],"ls"))
 				{
-					// 				Execute ls
-					ls_vcsh(i - 1, tokens);
-					// history_vcsh(i-1,tokens,0);
-
+					ls_vcsh(i - 1, tokens); // 				execute ls	
 				}
-				else if (tokens[n][0] == 'p' && tokens[n][1] == 'w' && tokens[n][2] == 'd')
+				else if (!strcmp(tokens[n],"pwd"))
 				{
-					// 				Execute pwd
-					pwd_vcsh();
-					// history_vcsh(i-1,tokens,0);
-
+					pwd_vcsh();				// 				execute pwd				
 				}
 				else
 				{
-					// 				Execute command
-					if (execvp(tokens[0], tokens) == -1)
+					if (execvp(tokens[0], tokens) == -1)	
 					{
-						for (ll n = 0; n < i; n++)
-						{
-							printf("|%s|", tokens[i]);
-						}
-						// history_vcsh(i-1,tokens,0);
 						perror("Erroor executing or wrong command\n");
 					}
 				}
-				// printf("end %lld<-\n",getpid());
-				exit(EXIT_FAILURE);
+				exit(0);
 			}
 			else if (pid < 0)
 			{
@@ -140,45 +137,37 @@ void redirect(char *argv)
 			}
 			else
 			{
-				printf("ho\n");
 				int status;
 				do
 				{
 					waitpid(pid, &status, WUNTRACED);
 				} while (!WIFEXITED(status) && !WIFSIGNALED(status));
-				// printf("-<end of proc %lld %lld %lld\n",WIFEXITED(status),WIFSIGNALED(status),getpid());
 			}
 		}
 		else
-		{
-			//			Execute in background
+		{	
+			suspendedjobnumber++;			//				execute in background
 			int pid = fork();
 			if (pid == 0)
 			{
-				if (tokens[n][0] == 'l' && tokens[n][1] == 's')
+				// pid_t pgrp = getpgrp();
+				setpgid(0,0);
+				if (!strcmp(tokens[n],"ls"))
 				{
-					// 				Execute ls
-					ls_vcsh(i - 1, tokens);
+					ls_vcsh(i - 1, tokens); // 				execute ls	
 				}
-				else if (tokens[n][0] == 'p' && tokens[n][1] == 'w' && tokens[n][2] == 'd')
+				else if (!strcmp(tokens[n],"pwd"))
 				{
-					// 				Execute pwd
-					pwd_vcsh();
+					pwd_vcsh();				// 				execute pwd				
 				}
 				else
 				{
-					// 				Execute command
 					if (execvp(tokens[0], tokens) == -1)
 					{
-						for (ll n = 0; n < i; n++)
-						{
-							printf("|%s|", tokens[i]);
-						}
-
 						perror("Erroor executing or wrong command\n");
 					}
 				}
-				exit(EXIT_FAILURE);
+				exit(0);
 			}
 			else if (pid < 0)
 			{
@@ -186,21 +175,16 @@ void redirect(char *argv)
 			}
 			else
 			{
-				printf("hi\n");
 				int status;
-				do
-				{
-					waitpid(pid, &status, WUNTRACED);
-				} while (!WIFEXITED(status) && !WIFSIGNALED(status));
-				// exit(0);
+				printf("Done %lld\n",suspendedjobnumber);
+				signal(SIGCHLD,signal_handler);
 			}
 		}
 	}
-
-	// 			Free up the memory
-	free(tokens);
+	free(tokens);									// 			Free up the memory
 	free(line);
 }
+
 
 ll shell_loop()
 {
@@ -217,11 +201,31 @@ ll shell_loop()
 		past_present_directory[n] = homedirectory[n];
 	}
 
+	for (ll i = 0; i < lengthofhomedirectory; i++)
+	{
+		HISTORYY[i] = homedirectory[i];
+	}
+	ll o = lengthofhomedirectory + 1;
+	HISTORYY[o - 1] = '/';
+	HISTORYY[o] = '.';
+	HISTORYY[o + 1] = 'v';
+	HISTORYY[o + 2] = 'c';
+	HISTORYY[o + 3] = 's';
+	HISTORYY[o + 4] = 'h';
+	HISTORYY[o + 5] = '_';
+	HISTORYY[o + 6] = 'h';
+	HISTORYY[o + 7] = 'i';
+	HISTORYY[o + 8] = 's';
+	HISTORYY[o + 9] = 't';
+	HISTORYY[o + 10] = 'o';
+	HISTORYY[o + 11] = 'r';
+	HISTORYY[o + 12] = 'y';
+	HISTORYY[o + 13] = '\0';
+	
 	while (1)
 	{
 		// 			SET PWD
 		char *c = getcwd(present_directory, sizeof(present_directory));
-		// printf("Got %s\n",present_directory);
 		if (strlen(present_directory) >= lengthofhomedirectory)
 		{
 			char PP[65536];
@@ -260,7 +264,7 @@ ll shell_loop()
 
 		// 			TAKE INPUT
 		buffer = readline();
-		history_vcsh(2,buffer,0);
+		history_vcsh(2, buffer, 0);
 
 		// 			PARSE THE INPUT
 		char **totalcommands = parse(buffer);
@@ -275,9 +279,7 @@ ll shell_loop()
 			commandnumber++;
 			commandnumber %= 20;
 			redirect(totalcommands[n]);
-
 			char *c = getcwd(present_directory, sizeof(present_directory));
-			// printf("Got %s\n",present_directory);
 			if (strlen(present_directory) >= lengthofhomedirectory)
 			{
 				char PP[65536];

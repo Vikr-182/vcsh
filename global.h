@@ -11,6 +11,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <grp.h>
+#include <termios.h>
 typedef long long ll;
 
 extern int errno; 
@@ -34,7 +35,7 @@ extern int errno;
 #define ANSI_DARKBLUE_BG "\x1b[46m"
 #define ANSI_GREY_BG "\x1b[47m"
 #define ANSI_CLEAR_SCREEN "\e[1;1H\e[2J"
-#define ANSI_RESET_SCREEN "\0033\143"
+#define ANSI_RESET_SCREEN "\033\143"
 
 char homedirectory[65536];
 char hostname[65536];
@@ -48,5 +49,8 @@ ll lengthofpresentdictionary;
 ll NUM_COMMANDS ;
 char HISTORY[20][500];
 ll commandnumber ;
+ll suspendedjobnumber ;
+ll jobs[3000][2] ;
+char HISTORYY[3000];
 // ll backgroundflag = 0;
 // ll foregroundflag = 0;

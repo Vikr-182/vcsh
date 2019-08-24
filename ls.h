@@ -84,11 +84,7 @@ void ls_vcsh(int argc, char *argv[])
 	int listing = 0;
 	int hidden = 0;
 	struct dirent *de;
-	/*for (ll n = 0; n <= argc; n++)
-	{
-		printf("|%s|", argv[n]);
-	}
-	printf("ho");*/
+
 	ll *array = (ll *)calloc(sizeof(ll), MAX_TOKENS);
 	for (ll i = 1; i <= argc; i++)
 	{
@@ -124,12 +120,9 @@ void ls_vcsh(int argc, char *argv[])
 		printf("\nPlease provide only 2 paths\n");
 	}
 	char *path = (char *)malloc(sizeof(char) * BUFFER_SIZE);
-	// printf("||_<>|%s|\n",homedirectory);
-	// printf("%lld %lld\n", f, find);
 	if (f)
 	{
 		//No path provided ls in current working directory
-		// printf("hi %s %d\n",present_directory,lengthofpresentdictionary);
 		for (ll n = 0; n < lengthofpresentdictionary; n++)
 		{
 			path[n] = present_directory[n];
@@ -148,10 +141,8 @@ void ls_vcsh(int argc, char *argv[])
 			{
 				path[n - 2 + lengthofhomedirectory + 1] = present_directory[n];
 			}
-			path[lengthofpresentdictionary-2+1+lengthofhomedirectory] = '\0';
+			path[lengthofpresentdictionary - 2 + 1 + lengthofhomedirectory] = '\0';
 		}
-		// printf("%s|\n",present_directory);
-		// printf("%s|\n", path);
 	}
 	else
 	{
@@ -167,7 +158,6 @@ void ls_vcsh(int argc, char *argv[])
 			{
 				path[n + lengthofhomedirectory + 2] = argv[find][n];
 			}
-			// printf("%s|\n", path);
 		}
 		else
 		{
@@ -176,7 +166,6 @@ void ls_vcsh(int argc, char *argv[])
 				path[n] = argv[find][n];
 			}
 			path[strlen(argv[find])] = '\0';
-			// printf("%s|\n", path);
 		}
 	}
 	ll invalid = 0;
@@ -184,7 +173,6 @@ void ls_vcsh(int argc, char *argv[])
 	{
 		if (array[n])
 		{
-			// printf("%s ok\n", argv[n]);
 			if (argv[n][0] == '-' && argv[n][1] == 'l' && argv[n][2] != 'a')
 			{
 				listing = 1;
@@ -215,8 +203,8 @@ void ls_vcsh(int argc, char *argv[])
 		printf("Invalid option\n");
 		return;
 	}
+
 	// Parse argv[] to get the correct path
-	// printf("yay %s\n",path);
 	DIR *p = opendir(path);
 	if (!p)
 	{
@@ -225,12 +213,12 @@ void ls_vcsh(int argc, char *argv[])
 	}
 	de = readdir(p);
 	int cnt = 0;
-	// printf("%lld %lld\n", listing, hidden);
 	ll a = chdir(path);
-	// printf("%s\n", present_directory);
 	ll totalnum = 0;
+	printf("hello\n");
 	while (de || !cnt)
 	{
+		ll thi = 0;
 		cnt++;
 
 		if (!de)
@@ -238,7 +226,6 @@ void ls_vcsh(int argc, char *argv[])
 			perror("Error occured opening the directory");
 			exit(EXIT_FAILURE);
 		}
-		// de->d_name contains the name of the file / directory
 		else
 		{
 			char filepath[30000];
@@ -251,7 +238,7 @@ void ls_vcsh(int argc, char *argv[])
 			{
 				filepath[i] = de->d_name[i - strlen(path)];
 			}
-			// printf("->%s<-\n", de->d_name);
+
 			struct stat h;
 			int a = stat(de->d_name, &h);
 			if (a == -1)
@@ -309,7 +296,6 @@ void ls_vcsh(int argc, char *argv[])
 					printf("\t");
 
 					// Last atime
-					// printf("%d",(h.st_atime));
 					struct tm *tm = localtime(&h.st_mtime);
 					char thetime[BUFFER_SIZE];
 					strcpy(thetime, asctime(tm));
@@ -321,6 +307,10 @@ void ls_vcsh(int argc, char *argv[])
 
 					// Printing block name
 					printf("%s", de->d_name);
+				}
+				else
+				{
+					thi = 1;
 				}
 			}
 			else if (listing && hidden)
@@ -395,19 +385,24 @@ void ls_vcsh(int argc, char *argv[])
 					allocate(h.st_mode, 0);
 					printf("%s\t", de->d_name);
 				}
+				else
+				{
+					thi = 1;
+				}
 			}
 			printf(ANSI_RESET);
 		}
-		printf("\n");
+		if (!thi)
+			printf("\n");
 		de = readdir(p);
 	}
-	printf("\n");
-	if(listing)
+	if (listing)
 	{
-		printf("total\t%lld\n",totalnum/2);
+		printf("total\t%lld\n", totalnum / 2);
 	}
 	char comm[BUFFER_SIZE + 2];
-	if(present_directory[0]=='~'){
+	if (present_directory[0] == '~')
+	{
 		for (ll n = 0; n < lengthofhomedirectory; n++)
 		{
 			comm[n] = homedirectory[n];
@@ -415,11 +410,12 @@ void ls_vcsh(int argc, char *argv[])
 		comm[lengthofhomedirectory] = '/';
 		for (ll n = 0; n < lengthofpresentdictionary; n++)
 		{
-			comm[lengthofhomedirectory+1+n] = present_directory[n+1];
+			comm[lengthofhomedirectory + 1 + n] = present_directory[n + 1];
 		}
 		ll b = chdir(comm);
 	}
-	else{
+	else
+	{
 		ll b = chdir(present_directory);
 	}
 }

@@ -73,7 +73,7 @@ ll cd_vcsh(char *argv[])
 	if (argv[1][0] == '-' && strlen(argv[1]) == 1)
 	{
 		// go back to previous directory
-		// printf("%s\n",past_present_directory);
+		printf("%s\n", past_present_directory);
 		ll g = chdir(past_present_directory);
 		if (g == -1)
 		{
@@ -107,38 +107,12 @@ void pwd_vcsh()
 	char B[65536];
 
 	getcwd(A, sizeof(A));
-	ll fg = 0;
-	// printf("|%s|\n",A);
-	if (strlen(A) >= strlen(homedirectory))
+	if (!A)
 	{
-		for (ll n = 0; n < lengthofhomedirectory; n++)
-		{
-			if (A[n] != homedirectory[n])
-			{
-				fg = 1;
-			}
-		}
+		perror("Cant see the present directory");
+		return;
 	}
-	else
-	{
-		fg = 1;
-	}
-	if (!fg)
-	{
-		B[0] = '~';
-		B[1] = '/';
-		// printf("Hi\n");
-		for (ll n = 2; n < strlen(A) - strlen(homedirectory) + 1; n++)
-		{
-			B[n] = A[n + lengthofhomedirectory - 1];
-		}
-		B[strlen(A) - strlen(homedirectory) + 1] = '\0';
-		printf("%s\n", B);
-	}
-	else
-	{
-		printf("%s\n", A);
-	}
+	printf("|%s|\n", A);
 }
 
 void clear()
@@ -154,10 +128,8 @@ void reset()
 void echo_vcsh(ll argc, char *argv[])
 {
 	ll nflag = 0;
-	// printf("ha\n");
 	for (ll i = 1; i < argc + 1; i++)
 	{
-		// printf("%lld\n",i);
 		if (argv[i][0] == '-' && argv[i][1] == 'n')
 		{
 			nflag = 0;
@@ -180,11 +152,7 @@ void echo_vcsh(ll argc, char *argv[])
 		}
 		majorstring[ind++] = ' ';
 	}
-/*	for (ll i = 0; i < ind; i++)
-	{
-		printf("%c ", majorstring[i]);
-	}
-*/
+
 	ll dollaraaya = 0;
 	for (ll i = 0; i < ind;)
 	{
@@ -205,8 +173,8 @@ void echo_vcsh(ll argc, char *argv[])
 			start = 0;
 			findind = i - 1;
 
-//				Print from i->j whatever it is
-			for (ll h = startind; h <= findind; )
+			//				Print from i->j whatever it is
+			for (ll h = startind; h <= findind;)
 			{
 				ll dollar = 0;
 				ll p;
@@ -221,7 +189,7 @@ void echo_vcsh(ll argc, char *argv[])
 					{
 						H[ij - h - 1] = majorstring[ij];
 					}
-					H[ij-h-1] = '\0';
+					H[ij - h - 1] = '\0';
 					dollar = 1;
 					char *b = getenv(H);
 					if (b && dollar)
@@ -239,7 +207,7 @@ void echo_vcsh(ll argc, char *argv[])
 					h++;
 				}
 			}
-			i = findind+2;
+			i = findind + 2;
 			continue;
 		}
 		else if (!start && majorstring[i] != '\"' && !dollaraaya)
@@ -257,9 +225,9 @@ void echo_vcsh(ll argc, char *argv[])
 			{
 				T[ij - i - 1] = majorstring[ij];
 			}
-			
-			T[ij-i-1] = '\0';
-			
+
+			T[ij - i - 1] = '\0';
+
 			i = ij;
 			char *b = getenv(T);
 			if (b)
@@ -271,12 +239,13 @@ void echo_vcsh(ll argc, char *argv[])
 			}
 			continue;
 		}
-		else if(!start && majorstring[i]!='$' && !dollaraaya)
+		else if (!start && majorstring[i] != '$' && !dollaraaya)
 		{
 			i++;
 			continue;
 		}
-		else{
+		else
+		{
 			i++;
 		}
 	}
@@ -285,4 +254,9 @@ void echo_vcsh(ll argc, char *argv[])
 	{
 		printf("\n");
 	}
+}
+
+void quit()
+{
+	exit(0);
 }

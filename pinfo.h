@@ -70,17 +70,36 @@ void pinfo_vcsh(char *argv[])
 
         char B[BUFFER_SIZE];
         ll cnt = 0;
-        while (cnt < 2)
+        fgets(B, BUFFER_SIZE, (FILE *)fd);
+        ll fg = 0;
+        if (B[0] == 'S' && B[1] == 't' && B[2] == 'a' && B[3] == 't' && B[4] == 'e')
+        {
+            fg = 1;
+        }
+        while (!fg)
         {
             fgets(B, BUFFER_SIZE, (FILE *)fd);
+            if (B[0] == 'S' && B[1] == 't' && B[2] == 'a' && B[3] == 't' && B[4] == 'e')
+            {
+                fg = 1;
+            }
             cnt++;
         }
         printf("Process %s", B);
 
-        while (cnt < 12)
+        ll bp = 0;
+        if (B[0] == 'V' && B[1] == 'm' && B[2] == 'S' && B[3] == 'i' && B[4] == 'z' && B[5] == 'e')
         {
-            fgets(B, BUFFER_SIZE, (FILE *)fd);
+            bp = 1;
+        }
+        while (!bp)
+        {
             cnt++;
+            fgets(B, BUFFER_SIZE, (FILE *)fd);
+            if (B[0] == 'V' && B[1] == 'm' && B[2] == 'S' && B[3] == 'i' && B[4] == 'z' && B[5] == 'e')
+            {
+                bp = 1;
+            }
         }
         ll ind;
         for (ll i = 0; i < strlen(B); i++)
@@ -153,17 +172,36 @@ void pinfo_vcsh(char *argv[])
 
         char B[BUFFER_SIZE];
         ll cnt = 0;
-        while (cnt < 2)
+        fgets(B, BUFFER_SIZE, (FILE *)fd);
+        ll fg = 0;
+        if (B[0] == 'S' && B[1] == 't' && B[2] == 'a' && B[3] == 't' && B[4] == 'e')
+        {
+            fg = 1;
+        }
+        while (!fg)
         {
             fgets(B, BUFFER_SIZE, (FILE *)fd);
+            if (B[0] == 'S' && B[1] == 't' && B[2] == 'a' && B[3] == 't' && B[4] == 'e')
+            {
+                fg = 1;
+            }
             cnt++;
         }
         printf("Process %s", B);
 
-        while (cnt < 12)
+        ll bp = 0;
+        if (B[0] == 'V' && B[1] == 'm' && B[2] == 'S' && B[3] == 'i' && B[4] == 'z' && B[5] == 'e')
         {
-            fgets(B, BUFFER_SIZE, (FILE *)fd);
+            bp = 1;
+        }
+        while (!bp)
+        {
             cnt++;
+            fgets(B, BUFFER_SIZE, (FILE *)fd);
+            if (B[0] == 'V' && B[1] == 'm' && B[2] == 'S' && B[3] == 'i' && B[4] == 'z' && B[5] == 'e')
+            {
+                bp = 1;
+            }
         }
         ll ind;
         for (ll i = 0; i < strlen(B); i++)
