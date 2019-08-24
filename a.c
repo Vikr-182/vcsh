@@ -6,8 +6,8 @@ int main(int argc, char const *argv[])
     char F;
     for (long long  i = 0; i < a; i++)
     {
-        scanf("%c",&F);
-        printf("%c\n",F);
+//        scanf("%c",&F);
+//        printf("%c\n",F);
     }
     printf("HI\n");
     return 0;

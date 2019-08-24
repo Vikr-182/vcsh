@@ -8,13 +8,15 @@
 #include "pinfo.h"
 #include "nightswatch.h"
 
-
 // ll pressedkey = 0;
 
-void signal_handler(){
-	int pid = waitpid(-1,NULL,WNOHANG);
-	if(pid>0){
-		printf("Child successfully exited %d\n",pid);
+void signal_handler()
+{
+	int pid = waitpid(-1, NULL, WNOHANG);
+	if (pid > 0)
+	{
+
+		printf("Child %d|%s| successfully exited %d\n", reversemapping[pid], characterarray[reversemapping[pid]], pid);
 	}
 }
 
@@ -40,37 +42,36 @@ void redirect(char *argv)
 	}
 	ll n = 0;
 
-
-	if(!strcmp(tokens[n],"vcsh"))
+	if (!strcmp(tokens[n], "vcsh"))
 	{
-		tokens[n] = (char *)malloc(sizeof(char)*10);
-		strcpy(tokens[n],"./a.out");		//			invoking shell	
+		tokens[n] = (char *)malloc(sizeof(char) * 10);
+		strcpy(tokens[n], "./a.out"); //			invoking shell
 	}
-	if (!strcmp(tokens[n],"cd"))
+	if (!strcmp(tokens[n], "cd"))
 	{
-		cd_vcsh(tokens);					// 			execute cd
+		cd_vcsh(tokens); // 			execute cd
 	}
-	else if (!strcmp(tokens[n],"echo"))
+	else if (!strcmp(tokens[n], "echo"))
 	{
-		echo_vcsh(i - 1, tokens);			// 			execute echo
+		echo_vcsh(i - 1, tokens); // 			execute echo
 	}
-	else if (!strcmp(tokens[n],"pinfo"))
+	else if (!strcmp(tokens[n], "pinfo"))
 	{
-		pinfo_vcsh(tokens);					// 			execute cd
+		pinfo_vcsh(tokens); // 			execute cd
 	}
-	else if (!strcmp(tokens[n],"pwd"))
+	else if (!strcmp(tokens[n], "pwd"))
 	{
-		pwd_vcsh();							// 			execute pwd
+		pwd_vcsh(); // 			execute pwd
 	}
-	else if (!strcmp(tokens[n],"nightswatch"))
+	else if (!strcmp(tokens[n], "nightswatch"))
 	{
-		nightswatch(tokens);				// 			execute nightswatch
+		nightswatch(tokens); // 			execute nightswatch
 	}
-	else if (!strcmp(tokens[n],"history"))
+	else if (!strcmp(tokens[n], "history"))
 	{
-		char F[200];						// 			execute history
-		ll ind  = 0;
-		for (ll q = 0; q <i; q++)
+		char F[200]; // 			execute history
+		ll ind = 0;
+		for (ll q = 0; q < i; q++)
 		{
 			for (ll p = 0; p < strlen(tokens[q]); p++)
 			{
@@ -79,30 +80,44 @@ void redirect(char *argv)
 			F[ind++] = ' ';
 		}
 		F[ind] = '\0';
-		// printf("%s\n",F);
-		history_vcsh(i,F,1);
+		// printf("%s\n",F);ls
+
+		history_vcsh(i, F, 1);
 	}
-	else if (!strcmp(tokens[n],"clear"))
+	else if (!strcmp(tokens[n], "clear"))
 	{
-		clear();							// 			execute clear
+		clear(); // 			execute clear
 	}
-	else if(!strcmp(tokens[n],"quit"))
+	else if (!strcmp(tokens[n], "quit"))
 	{
-		quit();								// 			execute exit
+		quit(); // 			execute exit
 	}
 	else
 	{
+
 		ll askedinbg = 0;
 		ll findind = 0;
 		for (ll n = 0; n < i && !askedinbg; n++)
 		{
 			if (tokens[n][0] == '&' && strlen(tokens[n]) == 1)
 			{
-				askedinbg = 1;				//			asked to execute in background
+				askedinbg = 1; //			asked to execute in background
 				findind = n;
 			}
 		}
-		if(askedinbg)
+		ll gh = 0;
+		ll find;
+		for (ll o = 0;!gh &&  o < strlen(argv); o++)
+		{
+			if(argv[o]=='&'){
+				gh = 1;
+				find = o;
+			}
+		}
+		if(gh){
+			argv[find] = '\0';
+		}
+		if (askedinbg)
 		{
 			for (ll j = findind; j < i; j++)
 			{
@@ -110,22 +125,22 @@ void redirect(char *argv)
 			}
 			i = findind;
 		}
-		if (!askedinbg)						//			execute in foreground
+		if (!askedinbg) //			execute in foreground
 		{
 			int pid = fork();
 			if (pid == 0)
 			{
-				if (!strcmp(tokens[n],"ls"))
+				if (!strcmp(tokens[n], "ls"))
 				{
-					ls_vcsh(i - 1, tokens); // 				execute ls	
+					ls_vcsh(i - 1, tokens); // 				execute ls
 				}
-				else if (!strcmp(tokens[n],"pwd"))
+				else if (!strcmp(tokens[n], "pwd"))
 				{
-					pwd_vcsh();				// 				execute pwd				
+					pwd_vcsh(); // 				execute pwd
 				}
 				else
 				{
-					if (execvp(tokens[0], tokens) == -1)	
+					if (execvp(tokens[0], tokens) == -1)
 					{
 						perror("Erroor executing or wrong command\n");
 					}
@@ -146,20 +161,32 @@ void redirect(char *argv)
 			}
 		}
 		else
-		{	
-			suspendedjobnumber++;			//				execute in background
+		{
+			// strcpy(str, argv);
+			printf("%s\n",argv);
+			for (ll i = 0; i < strlen(argv); i++)
+			{
+				characterarray[bgind][i] = argv[i];
+			}
+			characterarray[bgind][strlen(argv)] = '\0';
+			printf("copying %s %d %d %s %s\n", argv, bgind, getpid(), argv, characterarray[bgind]);
+			bgind++;
+			suspendedjobnumber++; //				execute in background
 			int pid = fork();
 			if (pid == 0)
 			{
 				// pid_t pgrp = getpgrp();
-				setpgid(0,0);
-				if (!strcmp(tokens[n],"ls"))
+				reversemapping[getpid()] = bgind-1;
+				printf("%lld of  is %lld\n",getpid(),bgind-1);
+				// naam = getpid();
+				setpgid(0, 0);
+				if (!strcmp(tokens[n], "ls"))
 				{
-					ls_vcsh(i - 1, tokens); // 				execute ls	
+					ls_vcsh(i - 1, tokens); // 				execute ls
 				}
-				else if (!strcmp(tokens[n],"pwd"))
+				else if (!strcmp(tokens[n], "pwd"))
 				{
-					pwd_vcsh();				// 				execute pwd				
+					pwd_vcsh(); // 				execute pwd
 				}
 				else
 				{
@@ -176,16 +203,17 @@ void redirect(char *argv)
 			}
 			else
 			{
+
+				bgind++;
 				int status;
-				printf("Done %lld\n",suspendedjobnumber);
-				signal(SIGCHLD,signal_handler);
+				printf("Done %lld\n", suspendedjobnumber);
+				signal(SIGCHLD, signal_handler);
 			}
 		}
 	}
-	free(tokens);									// 			Free up the memory
+	free(tokens); // 			Free up the memory
 	free(line);
 }
-
 
 ll shell_loop()
 {
@@ -222,43 +250,12 @@ ll shell_loop()
 	HISTORYY[o + 11] = 'r';
 	HISTORYY[o + 12] = 'y';
 	HISTORYY[o + 13] = '\0';
+	printf("*******  Welcome to vcsh  \u263A  ***************\n");
 	// printf("%s\n",HISTORYY);
 	while (1)
 	{
 		// 			SET PWD
-		char *c = getcwd(present_directory, sizeof(present_directory));
-		if (strlen(present_directory) >= lengthofhomedirectory)
-		{
-			char PP[65536];
-			ll fg = 0;
-			for (ll n = 0; !fg && n < lengthofhomedirectory; n++)
-			{
-				if (present_directory[n] != homedirectory[n])
-				{
-					fg = 1;
-				}
-			}
-			if (!fg)
-			{
-				PP[0] = '~';
-				for (ll n = lengthofhomedirectory; n < strlen(present_directory); n++)
-				{
-					PP[n - lengthofhomedirectory + 1] = present_directory[n];
-				}
-				PP[strlen(present_directory) - lengthofhomedirectory + 1] = '\0';
-				for (ll n = 0; n < strlen(present_directory) - lengthofhomedirectory + 1; n++)
-				{
-					present_directory[n] = PP[n];
-				}
-				present_directory[strlen(present_directory) - lengthofhomedirectory + 1] = '\0';
-				lengthofpresentdictionary = strlen(present_directory);
-			}
-			else
-			{
-				lengthofpresentdictionary = strlen(present_directory);
-			}
-		}
-		lengthofpresentdictionary = strlen(present_directory);
+		setpwd();
 
 		// 			DISPLAY PROMPT
 		prompt_display();
@@ -280,39 +277,9 @@ ll shell_loop()
 			commandnumber++;
 			commandnumber %= 20;
 			redirect(totalcommands[n]);
-			char *c = getcwd(present_directory, sizeof(present_directory));
-			if (strlen(present_directory) >= lengthofhomedirectory)
-			{
-				char PP[65536];
-				ll fg = 0;
-				for (ll n = 0; !fg && n < lengthofhomedirectory; n++)
-				{
-					if (present_directory[n] != homedirectory[n])
-					{
-						fg = 1;
-					}
-				}
-				if (!fg)
-				{
-					PP[0] = '~';
-					for (ll n = lengthofhomedirectory; n < strlen(present_directory); n++)
-					{
-						PP[n - lengthofhomedirectory + 1] = present_directory[n];
-					}
-					PP[strlen(present_directory) - lengthofhomedirectory + 1] = '\0';
-					for (ll n = 0; n < strlen(present_directory) - lengthofhomedirectory + 1; n++)
-					{
-						present_directory[n] = PP[n];
-					}
-					present_directory[strlen(present_directory) - lengthofhomedirectory + 1] = '\0';
-					lengthofpresentdictionary = strlen(present_directory);
-				}
-				else
-				{
-					lengthofpresentdictionary = strlen(present_directory);
-				}
-			}
-			lengthofpresentdictionary = strlen(present_directory);
+			setpwd();
+			printf("hi %d\n", characterarray[0][0]);
+			resize();
 		}
 	}
 	return EXIT_FAILURE;

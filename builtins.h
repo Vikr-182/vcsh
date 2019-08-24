@@ -260,3 +260,40 @@ void quit()
 {
 	exit(0);
 }
+
+void setpwd()
+{
+	char *c = getcwd(present_directory, sizeof(present_directory));
+	if (strlen(present_directory) >= lengthofhomedirectory)
+	{
+		char PP[65536];
+		ll fg = 0;
+		for (ll n = 0; !fg && n < lengthofhomedirectory; n++)
+		{
+			if (present_directory[n] != homedirectory[n])
+			{
+				fg = 1;
+			}
+		}
+		if (!fg)
+		{
+			PP[0] = '~';
+			for (ll n = lengthofhomedirectory; n < strlen(present_directory); n++)
+			{
+				PP[n - lengthofhomedirectory + 1] = present_directory[n];
+			}
+			PP[strlen(present_directory) - lengthofhomedirectory + 1] = '\0';
+			for (ll n = 0; n < strlen(present_directory) - lengthofhomedirectory + 1; n++)
+			{
+				present_directory[n] = PP[n];
+			}
+			present_directory[strlen(present_directory) - lengthofhomedirectory + 1] = '\0';
+			lengthofpresentdictionary = strlen(present_directory);
+		}
+		else
+		{
+			lengthofpresentdictionary = strlen(present_directory);
+		}
+	}
+	lengthofpresentdictionary = strlen(present_directory);
+}

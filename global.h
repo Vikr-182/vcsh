@@ -37,6 +37,7 @@ extern int errno;
 #define ANSI_CLEAR_SCREEN "\e[1;1H\e[2J"
 #define ANSI_RESET_SCREEN "\033\143"
 
+char str[100];
 char homedirectory[65536];
 char hostname[65536];
 char username[65536];
@@ -47,10 +48,16 @@ char *buffer;
 ll lengthofhomedirectory;
 ll lengthofpresentdictionary;
 ll NUM_COMMANDS ;
+ll reversemapping[3000000];
+ll bgind;
+ll procaarray[30000];
+char characterarray[10000][100];
+
 char HISTORY[20][500];
 ll commandnumber ;
 ll suspendedjobnumber ;
 ll jobs[3000][2] ;
+ll naam;
 char HISTORYY[3000];
 // ll backgroundflag = 0;
 // ll foregroundflag = 0;
