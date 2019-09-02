@@ -1,11 +1,12 @@
 #include "global.h"
 
-char *readline()
+char *input()
 { //              READS LINE UNITL \n ENCOUNTERED
 	char *A = (char *)malloc(sizeof(char) * BUFFER_SIZE);
 	char B;
 	char *C = (char *)malloc(sizeof(char) * BUFFER_SIZE);
 	fgets(A, BUFFER_SIZE, stdin);
+	//A = readline(">prompt");
 	A[strlen(A) - 1] = '\0';
 	if (A[0] == (0))
 	{
@@ -16,7 +17,7 @@ char *readline()
 }
 
 char **parse(char *line)
-{ //              PARSES COMMANDS BY " "
+{ //              PARSES COMMANDS BY "; "
 	char **commands = malloc(sizeof(char *) * (MAX_COMMANDS));
 	if (!commands)
 	{

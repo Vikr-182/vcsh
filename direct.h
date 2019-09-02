@@ -1,12 +1,13 @@
 #include "global.h"
 #include "ls.h"
 #include "prompt.h"
-#include "readline.h"
+#include "input.h"
 #include "builtins.h"
 #include "clear.h"
 #include "history.h"
 #include "pinfo.h"
 #include "nightswatch.h"
+#include "jobs.h"
 
 // ll pressedkey = 0;
 
@@ -39,56 +40,18 @@ void redirect(char *argv)
 	}
 	ll n = 0;
 
-	/*for(int h=0;h<i;h++)
-	{
-		printf("|%s|",tokens[h]);
-	}*/
-
-	if (!strcmp(tokens[n], "vcsh"))
+	if (!strcmp(tokens[n], "vcsh"))							//			invoking shell
 	{
 		tokens[n] = (char *)malloc(sizeof(char) * 10);
-		strcpy(tokens[n], "./a.out"); //			invoking shell
+		strcpy(tokens[n], "./a.out"); 
 	}
-	if (!strcmp(tokens[n], "cd"))
+	if (!strcmp(tokens[n], "cd"))							// 			execute cd
 	{
-		cd_vcsh(tokens); // 			execute cd
+		cd_vcsh(tokens); 				
 	}
-	else if (!strcmp(tokens[n], "echo"))
+	else if (!strcmp(tokens[n], "quit"))						// 			execute exit
 	{
-		echo_vcsh(i - 1, tokens); // 			execute echo
-	}
-	else if (!strcmp(tokens[n], "pinfo"))
-	{
-		pinfo_vcsh(tokens); // 			execute cd
-	}
-	else if (!strcmp(tokens[n], "pwd"))
-	{
-		pwd_vcsh(); // 			execute pwd
-	}
-	else if (!strcmp(tokens[n], "nightswatch"))
-	{
-		nightswatch(tokens); // 			execute nightswatch
-	}
-	else if (!strcmp(tokens[n], "history"))
-	{
-		char F[200]; // 			execute history
-		ll ind = 0;
-		for (ll q = 0; q < i; q++)
-		{
-			for (ll p = 0; p < strlen(tokens[q]); p++)
-			{
-				F[ind++] = tokens[q][p];
-			}
-			F[ind++] = ' ';
-		}
-		F[ind] = '\0';
-		// printf("%s\n",F);ls
-
-		history_vcsh(i, F, 1);
-	}
-	else if (!strcmp(tokens[n], "quit"))
-	{
-		quit(); // 			execute exit
+		quit(); 	
 	}
 	else
 	{
@@ -99,7 +62,7 @@ void redirect(char *argv)
 		{
 			if (tokens[n][0] == '&' && strlen(tokens[n]) == 1)
 			{
-				askedinbg = 1; //			asked to execute in background
+				askedinbg = 1; 
 				findind = n;
 			}
 		}
@@ -125,8 +88,9 @@ void redirect(char *argv)
 			}
 			i = findind;
 		}
-		if (!askedinbg) //			execute in foreground
+		if (!askedinbg) 
 		{
+//			asked to execute in foreground
 			int pid = fork();
 			if (pid == 0)
 			{
@@ -138,6 +102,44 @@ void redirect(char *argv)
 				{
 					pwd_vcsh(); // 				execute pwd
 				}
+				else if (!strcmp(tokens[n], "echo"))
+				{
+					echo_vcsh(i - 1, tokens); //                    execute echo
+				}
+				else if (!strcmp(tokens[n], "pinfo"))
+				{
+					pinfo_vcsh(tokens); //                  execute cd
+				}
+				else if (!strcmp(tokens[n], "pwd"))
+				{
+					pwd_vcsh(); //                  execute pwd
+				}
+				else if (!strcmp(tokens[n], "nightswatch"))
+				{
+					nightswatch(tokens); //                         execute nightswatch
+				}
+				else if(!strcmp(tokens[n],"showjobs"))
+                                {
+                                        showjobs();
+                                }
+				else if (!strcmp(tokens[n], "history"))
+				{
+					char F[200]; //                         execute history
+					ll ind = 0;
+					for (ll q = 0; q < i; q++)
+					{
+						for (ll p = 0; p < strlen(tokens[q]); p++)
+						{
+							F[ind++] = tokens[q][p];
+						}
+						F[ind++] = ' ';
+					}
+					F[ind] = '\0';
+					// printf("%s\n",F);ls
+
+					history_vcsh(i, F, 1);
+				}
+
 				else
 				{
 					if (execvp(tokens[0], tokens) == -1)
@@ -160,19 +162,18 @@ void redirect(char *argv)
 				} while (!WIFEXITED(status) && !WIFSIGNALED(status));
 			}
 		}
-		else
+		else	
 		{
-			// strcpy(str, argv);
+//			execute in background
 			printf("%s\n", argv);
 			for (ll i = 0; i < strlen(argv); i++)
 			{
 				characterarray[bgind][i] = argv[i];
 			}
 			int pid = fork();
-			suspendedjobnumber++; //				execute in background
+			suspendedjobnumber++;
 			if (pid == 0)
 			{
-				// naam = getpid();
 				setpgid(0, 0);
 				if (!strcmp(tokens[n], "ls"))
 				{
@@ -181,6 +182,43 @@ void redirect(char *argv)
 				else if (!strcmp(tokens[n], "pwd"))
 				{
 					pwd_vcsh(); // 				execute pwd
+				}
+				else if (!strcmp(tokens[n], "echo"))
+				{
+					echo_vcsh(i - 1, tokens); //                    execute echo
+				}
+				else if (!strcmp(tokens[n], "pinfo"))
+				{
+					pinfo_vcsh(tokens); //                  execute cd
+				}
+				else if (!strcmp(tokens[n], "pwd"))
+				{
+					pwd_vcsh(); //                  execute pwd
+				}
+				else if (!strcmp(tokens[n], "nightswatch"))
+				{
+					nightswatch(tokens); //                         execute nightswatch
+				}
+				else if(!strcmp(tokens[n],"showjobs"))
+				{
+					showjobs();
+				}
+				else if (!strcmp(tokens[n], "history"))
+				{
+					char F[200]; //                         execute history
+					ll ind = 0;
+					for (ll q = 0; q < i; q++)
+					{
+						for (ll p = 0; p < strlen(tokens[q]); p++)
+						{
+							F[ind++] = tokens[q][p];
+						}
+						F[ind++] = ' ';
+					}
+					F[ind] = '\0';
+					// printf("%s\n",F);ls
+
+					history_vcsh(i, F, 1);
 				}
 				else
 				{
@@ -248,6 +286,8 @@ ll shell_loop()
 	printf("*******  Welcome to vcsh  \u263A  ***************\n");
 	// printf("%s\n",HISTORYY);
 	signal(SIGCHLD, signal_handler);
+
+	rl_bind_key('\t',rl_complete);
 	while (1)
 	{
 		// 			SET PWD
@@ -257,7 +297,7 @@ ll shell_loop()
 		prompt_display();
 
 		// 			TAKE INPUT
-		buffer = readline();
+		buffer = input();
 		history_vcsh(2, buffer, 0);
 
 		// 			PARSE THE INPUT

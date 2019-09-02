@@ -10,6 +10,7 @@ A basic shell in C
 - `ls`
 - `history`
 - Putting process into background
+- `nightswatch`
 
 ## File stucture
 
@@ -18,5 +19,6 @@ A basic shell in C
 - prompt display happens in prompt.h
 - history.h controls history
 - Readline takes the input
+- nightswatch.h implements nightswatch command
 
 Hope you enjoy :-)

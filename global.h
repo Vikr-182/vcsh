@@ -13,6 +13,10 @@
 #include <grp.h>
 #include <termios.h>
 #include <curses.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+
 typedef long long ll;
 
 extern int errno; 
