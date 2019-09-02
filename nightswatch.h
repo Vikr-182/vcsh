@@ -32,13 +32,27 @@ void nightswatch(char *argv[])
     if (!strcmp(argv[3], "interrupt"))
     {
         char interruptpath[5000] = "/proc/interrupts";
-
         int pid = fork();
         if (pid == 0)
         {
             // Execute this
-            FILE *fd = fopen(interruptpath, "r");
-            fclose(fd);
+            while (1)
+            {
+                int fd = open(interruptpath, O_RDONLY);
+                int a = lseek(fd, 0, SEEK_END);
+                char B[4000];
+                read(fd, B, a);
+                // printf("%lld\n", a);
+                printf("%s\n", B);
+                int milli_seconds = 1000 * waiting;
+                // Stroing start time
+                clock_t start_time = clock();
+
+                // looping till required time is not acheived
+                while (clock() < start_time + milli_seconds)
+                    ;
+                close(fd);
+            }
             exit(0);
         }
         else if (pid < 0)
@@ -48,10 +62,6 @@ void nightswatch(char *argv[])
         else
         {
             int status;
-            do
-            {
-                waitpid(pid, &status, WUNTRACED);
-            } while (!WIFEXITED(status) && !WIFSIGNALED(status) && !run);
         }
     }
     else if (!strcmp(argv[3], "dirty"))
@@ -61,9 +71,44 @@ void nightswatch(char *argv[])
         int pid = fork();
         if (pid == 0)
         {
-            FILE *fd = fopen(meminfopath, "r");
-            fclose(fd);
+            while (1)
+            {
+                FILE *fd = fopen(meminfopath, "r");
+                char u[BUFFER_SIZE];
+                size_t len;
+                ll a = fgets(u, BUFFER_SIZE, fd);
+                ll r = 0;
+                if (u[0] == 'D' && u[1] == 'i' && u[2] == 'r' && u[3] == 't' && u[4] == 'y')
+                {
+                    r = 1;
+                }
+                while (!r)
+                {
+                    ll a = fgets(u, BUFFER_SIZE, fd);
+                    if (u[0] == 'D' && u[1] == 'i' && u[2] == 'r' && u[3] == 't' && u[4] == 'y')
+                    {
+                        r = 1;
+                    }
+                }
+                printf("%s\n", u);
+                int milli_seconds = 1000 * waiting;
+                // Stroing start time
+                clock_t start_time = clock();
+
+                // looping till required time is not acheived
+                while (clock() < start_time + milli_seconds)
+                    ;
+                fclose(fd);
+            }
             exit(0);
+            char A = getchar();
+            int cc;
+            while (A != 'q')
+            {
+                waitpid(pid, &cc, WNOHANG | WUNTRACED);
+                A = getchar();
+            }
+            kill(pid, SIGKILL);
         }
         else if (pid < 0)
         {
@@ -72,10 +117,14 @@ void nightswatch(char *argv[])
         else
         {
             int status;
+            char A = getchar();
+            int cc;
             do
             {
                 waitpid(pid, &status, WUNTRACED);
-            } while (!WIFEXITED(status) && !WIFSIGNALED(status) && !run);
+                A = getchar();
+            } while (!WIFEXITED(status) && !WIFSIGNALED(status) && A != 'q');
+            kill(pid, SIGKILL);
         }
     }
 }

@@ -43,7 +43,6 @@ void resize()
          fputs(tokens[j],fd2);
     }
     fclose(fd2);
-    printf("ok\n");
 }
 
 void history_vcsh(int argc, char *argv, ll flag)

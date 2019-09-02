@@ -10,15 +10,12 @@
 
 // ll pressedkey = 0;
 
-void signal_handler()
-{
-	int pid = waitpid(-1, NULL, WNOHANG);
-	if (pid > 0)
-	{
+ll NUM_COMMANDS;
+ll reversemapping[3000000];
+ll bgind;
+ll procaarray[30000];
 
-		printf("Child %d|%s| successfully exited %d\n", reversemapping[pid], characterarray[reversemapping[pid]], pid);
-	}
-}
+void signal_handler();
 
 void redirect(char *argv)
 {
@@ -107,14 +104,16 @@ void redirect(char *argv)
 		}
 		ll gh = 0;
 		ll find;
-		for (ll o = 0;!gh &&  o < strlen(argv); o++)
+		for (ll o = 0; !gh && o < strlen(argv); o++)
 		{
-			if(argv[o]=='&'){
+			if (argv[o] == '&')
+			{
 				gh = 1;
 				find = o;
 			}
 		}
-		if(gh){
+		if (gh)
+		{
 			argv[find] = '\0';
 		}
 		if (askedinbg)
@@ -163,21 +162,15 @@ void redirect(char *argv)
 		else
 		{
 			// strcpy(str, argv);
-			printf("%s\n",argv);
+			printf("%s\n", argv);
 			for (ll i = 0; i < strlen(argv); i++)
 			{
 				characterarray[bgind][i] = argv[i];
 			}
-			characterarray[bgind][strlen(argv)] = '\0';
-			printf("copying %s %d %d %s %s\n", argv, bgind, getpid(), argv, characterarray[bgind]);
-			bgind++;
-			suspendedjobnumber++; //				execute in background
 			int pid = fork();
+			suspendedjobnumber++; //				execute in background
 			if (pid == 0)
 			{
-				// pid_t pgrp = getpgrp();
-				reversemapping[getpid()] = bgind-1;
-				printf("%lld of  is %lld\n",getpid(),bgind-1);
 				// naam = getpid();
 				setpgid(0, 0);
 				if (!strcmp(tokens[n], "ls"))
@@ -203,11 +196,12 @@ void redirect(char *argv)
 			}
 			else
 			{
-
+				procaarray[bgind] = pid;
 				bgind++;
+				strcpy(characterarray[pid], argv);
 				int status;
 				printf("Done %lld\n", suspendedjobnumber);
-				signal(SIGCHLD, signal_handler);
+				return;
 			}
 		}
 	}
@@ -252,6 +246,7 @@ ll shell_loop()
 	HISTORYY[o + 13] = '\0';
 	printf("*******  Welcome to vcsh  \u263A  ***************\n");
 	// printf("%s\n",HISTORYY);
+	signal(SIGCHLD, signal_handler);
 	while (1)
 	{
 		// 			SET PWD
@@ -278,9 +273,36 @@ ll shell_loop()
 			commandnumber %= 20;
 			redirect(totalcommands[n]);
 			setpwd();
-			printf("hi %d\n", characterarray[0][0]);
 			resize();
 		}
 	}
 	return EXIT_FAILURE;
+}
+
+void signal_handler()
+{
+	int c;
+	ll mil = 0;
+	ll io = 0;
+	for (ll i = 0; !mil && i < bgind; i++)
+	{
+		int r = waitpid(procaarray[i], &c, WNOHANG | WUNTRACED);
+		resize();
+		if (procaarray[i] == r)
+		{
+			if (WIFEXITED(c))
+			{
+				resize();
+				printf("|%s|%lld exited normally with status %lld\n", characterarray[r], procaarray[i], c);
+			}
+			else if (WIFSIGNALED(c))
+			{
+				resize();
+				printf("|%s|%lld exited with status %lld\n", characterarray[r], procaarray[i], c);
+			}
+			mil = 1;
+			io = i;
+		}
+	}
+	signal(SIGCHLD, signal_handler);
 }

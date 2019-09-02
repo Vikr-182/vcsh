@@ -216,6 +216,7 @@ void ls_vcsh(int argc, char *argv[])
 	ll a = chdir(path);
 	ll totalnum = 0;
 	// printf("hello\n");
+
 	
 	while (de || !cnt)
 	{

@@ -47,10 +47,10 @@ char *buffer;
 
 ll lengthofhomedirectory;
 ll lengthofpresentdictionary;
-ll NUM_COMMANDS ;
-ll reversemapping[3000000];
-ll bgind;
-ll procaarray[30000];
+extern ll NUM_COMMANDS ;
+extern ll reversemapping[3000000];
+extern ll bgind;
+extern ll procaarray[30000];
 char characterarray[10000][100];
 
 char HISTORY[20][500];
