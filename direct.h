@@ -39,6 +39,11 @@ void redirect(char *argv)
 	}
 	ll n = 0;
 
+	/*for(int h=0;h<i;h++)
+	{
+		printf("|%s|",tokens[h]);
+	}*/
+
 	if (!strcmp(tokens[n], "vcsh"))
 	{
 		tokens[n] = (char *)malloc(sizeof(char) * 10);
@@ -80,10 +85,6 @@ void redirect(char *argv)
 		// printf("%s\n",F);ls
 
 		history_vcsh(i, F, 1);
-	}
-	else if (!strcmp(tokens[n], "clear"))
-	{
-		clear(); // 			execute clear
 	}
 	else if (!strcmp(tokens[n], "quit"))
 	{

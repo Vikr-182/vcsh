@@ -115,10 +115,6 @@ void pwd_vcsh()
 	printf("|%s|\n", A);
 }
 
-void clear()
-{
-	printf(ANSI_CLEAR_SCREEN);
-}
 
 void reset()
 {
