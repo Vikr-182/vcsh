@@ -1,4 +1,3 @@
-#include "global.h"
 
 ll cd_vcsh(char *argv[])
 {

@@ -1,6 +1,5 @@
-#include "global.h"
 
-void pinfo_vcsh(char *argv[])
+void pinfo_vcsh(char *argv[],int para)
 {
     if (argv[2] != NULL)
     {
@@ -9,7 +8,7 @@ void pinfo_vcsh(char *argv[])
     if (argv[1] == NULL)
     {
         //         Current process in the info need to print about
-        pid_t pid = getpid();
+        pid_t pid = para;
         if (pid < 0)
         {
             perror("Getting pid");

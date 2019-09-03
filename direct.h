@@ -8,6 +8,7 @@
 #include "pinfo.h"
 #include "nightswatch.h"
 #include "jobs.h"
+#include "cronjob.h"
 
 // ll pressedkey = 0;
 
@@ -53,6 +54,23 @@ void redirect(char *argv)
 	{
 		quit(); 	
 	}
+
+	else if (!strcmp(tokens[n], "pwd"))
+	{
+		pwd_vcsh(); // 				execute pwd
+	}
+	else if (!strcmp(tokens[n], "echo"))
+	{
+		echo_vcsh(i - 1, tokens); //                    execute echo
+	}
+	else if (!strcmp(tokens[n], "pinfo"))
+	{
+		pinfo_vcsh(tokens,parentid); //                  execute cd
+	}
+	else if (!strcmp(tokens[n], "pwd"))
+	{
+		pwd_vcsh(); //                  execute pwd
+	}
 	else
 	{
 
@@ -90,7 +108,8 @@ void redirect(char *argv)
 		}
 		if (!askedinbg) 
 		{
-//			asked to execute in foreground
+			//			asked to execute in foreground
+			signal(SIGCHLD, signal_handler);
 			int pid = fork();
 			if (pid == 0)
 			{
@@ -98,30 +117,14 @@ void redirect(char *argv)
 				{
 					ls_vcsh(i - 1, tokens); // 				execute ls
 				}
-				else if (!strcmp(tokens[n], "pwd"))
-				{
-					pwd_vcsh(); // 				execute pwd
-				}
-				else if (!strcmp(tokens[n], "echo"))
-				{
-					echo_vcsh(i - 1, tokens); //                    execute echo
-				}
-				else if (!strcmp(tokens[n], "pinfo"))
-				{
-					pinfo_vcsh(tokens); //                  execute cd
-				}
-				else if (!strcmp(tokens[n], "pwd"))
-				{
-					pwd_vcsh(); //                  execute pwd
-				}
 				else if (!strcmp(tokens[n], "nightswatch"))
 				{
 					nightswatch(tokens); //                         execute nightswatch
 				}
-				else if(!strcmp(tokens[n],"showjobs"))
-                                {
-                                        showjobs();
-                                }
+				else if(!strcmp(tokens[n],"jobs"))
+				{
+					showjobs();
+				}
 				else if (!strcmp(tokens[n], "history"))
 				{
 					char F[200]; //                         execute history
@@ -139,7 +142,10 @@ void redirect(char *argv)
 
 					history_vcsh(i, F, 1);
 				}
-
+				else if(!strcmp(tokens[n],"cronjob"))
+				{
+					vcsh_cronjob(tokens);
+				}
 				else
 				{
 					if (execvp(tokens[0], tokens) == -1)
@@ -164,7 +170,8 @@ void redirect(char *argv)
 		}
 		else	
 		{
-//			execute in background
+			//			execute in background
+			signal(SIGCHLD, signal_handler);
 			printf("%s\n", argv);
 			for (ll i = 0; i < strlen(argv); i++)
 			{
@@ -189,7 +196,7 @@ void redirect(char *argv)
 				}
 				else if (!strcmp(tokens[n], "pinfo"))
 				{
-					pinfo_vcsh(tokens); //                  execute cd
+					pinfo_vcsh(tokens,parentid); //                  execute cd
 				}
 				else if (!strcmp(tokens[n], "pwd"))
 				{
@@ -199,7 +206,7 @@ void redirect(char *argv)
 				{
 					nightswatch(tokens); //                         execute nightswatch
 				}
-				else if(!strcmp(tokens[n],"showjobs"))
+				else if(!strcmp(tokens[n],"jobs"))
 				{
 					showjobs();
 				}
@@ -220,6 +227,11 @@ void redirect(char *argv)
 
 					history_vcsh(i, F, 1);
 				}
+				else if(!strcmp(tokens[n],"cronjob"))
+				{
+					vcsh_cronjob(tokens);
+				}
+
 				else
 				{
 					if (execvp(tokens[0], tokens) == -1)
@@ -268,26 +280,16 @@ ll shell_loop()
 		HISTORYY[i] = homedirectory[i];
 	}
 	ll o = lengthofhomedirectory + 1;
-	HISTORYY[o - 1] = '/';
-	HISTORYY[o] = '.';
-	HISTORYY[o + 1] = 'v';
-	HISTORYY[o + 2] = 'c';
-	HISTORYY[o + 3] = 's';
-	HISTORYY[o + 4] = 'h';
-	HISTORYY[o + 5] = '_';
-	HISTORYY[o + 6] = 'h';
-	HISTORYY[o + 7] = 'i';
-	HISTORYY[o + 8] = 's';
-	HISTORYY[o + 9] = 't';
-	HISTORYY[o + 10] = 'o';
-	HISTORYY[o + 11] = 'r';
-	HISTORYY[o + 12] = 'y';
-	HISTORYY[o + 13] = '\0';
+	char copystring[100] = "/.vcsh_history";
+	for(ll y=0;y<15;y++){
+		HISTORYY[y+o-1] = copystring[y];
+	}
 	printf("*******  Welcome to vcsh  \u263A  ***************\n");
-	// printf("%s\n",HISTORYY);
 	signal(SIGCHLD, signal_handler);
-
 	rl_bind_key('\t',rl_complete);
+	parentid = getpid();
+	ll cl = 0;
+	ll beforepressed = 0;
 	while (1)
 	{
 		// 			SET PWD
@@ -298,11 +300,39 @@ ll shell_loop()
 
 		// 			TAKE INPUT
 		buffer = input();
-		history_vcsh(2, buffer, 0);
-
+		if(pressedkey)
+		{
+			// 					Display num command from last at prompt and expect user to hit enter
+			char BUF[512][512];
+			int ind = 0;
+			FILE *fd = fopen(HISTORYY, "r");
+			if (!fd)
+			{
+				perror("Can't open .vcsh_history");
+			}
+			char *u = NULL;
+			size_t len;
+			ll a = getline(&u, &len, fd);
+			int cnt = 0;
+			strcpy(BUF[cnt],u);
+			while(a != -1)
+			{
+				strcpy(BUF[cnt], u);
+				cnt++;
+				a = getline(&u, &len, fd);
+			}
+			strcpy(buffer,BUF[cnt-numpressed]);
+			prompt_display();
+			buffer[strlen(buffer)-1] = '\0';
+			printf("%s\n",buffer);
+			//printf("\r%s",buffer);
+		}
+		else if(!pressedkey)
+		{
+			history_vcsh(2, buffer, 0);
+		}
 		// 			PARSE THE INPUT
 		char **totalcommands = parse(buffer);
-
 		for (ll n = 0; n <= NUM_COMMANDS; n++)
 		{
 			for (ll j = 0; j < strlen(totalcommands[n]); j++)
@@ -313,9 +343,12 @@ ll shell_loop()
 			commandnumber++;
 			commandnumber %= 20;
 			redirect(totalcommands[n]);
+			signal(SIGCHLD, signal_handler);
 			setpwd();
 			resize();
 		}
+		pressedkey = 0;
+
 	}
 	return EXIT_FAILURE;
 }
@@ -345,5 +378,5 @@ void signal_handler()
 			io = i;
 		}
 	}
-	signal(SIGCHLD, signal_handler);
+	//signal(SIGCHLD, signal_handler);
 }

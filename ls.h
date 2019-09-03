@@ -1,4 +1,3 @@
-#include "global.h"
 
 mode_t persons[3][3] = {{S_IRUSR, S_IWUSR, S_IXUSR}, {S_IRGRP, S_IWGRP, S_IXGRP}, {S_IROTH, S_IWOTH, S_IXOTH}};
 char values[3] = {'r', 'w', 'x'};

@@ -1,4 +1,3 @@
-#include "global.h"
 
 char *input()
 { //              READS LINE UNITL \n ENCOUNTERED
@@ -8,10 +7,13 @@ char *input()
 	fgets(A, BUFFER_SIZE, stdin);
 	//A = readline(">prompt");
 	A[strlen(A) - 1] = '\0';
-	if (A[0] == (0))
+	if (A[0] == '\33')
 	{
-		A[0] = '\n';
-		A[1] = '\0';
+		if(A[1]=='[' && A[2]=='A')
+		{
+			numpressed = strlen(A)/3;
+			pressedkey = 1;
+		}
 	}
 	return A;
 }

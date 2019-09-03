@@ -1,4 +1,3 @@
-#include "global.h"
 #include <curses.h>
 
 void nightswatch(char *argv[])

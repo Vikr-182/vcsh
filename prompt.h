@@ -1,4 +1,3 @@
-#include "global.h"
 
 void prompt_display()
 {
