@@ -42,30 +42,40 @@ extern int errno;
 #define ANSI_CLEAR_SCREEN "\e[1;1H\e[2J"
 #define ANSI_RESET_SCREEN "\033\143"
 
+// PROMPT INFORMATION
 char str[100];
 char homedirectory[65536];
 char hostname[65536];
 char username[65536];
 char present_directory[65536];
 char past_present_directory[65536];
-char *buffer;
-
 ll lengthofhomedirectory;
 ll lengthofpresentdictionary;
+
+// COMMAND INFORMATION
+int pressedkey = 0;
+int numpressed = 0;
+ll NUM_PIPES;
 extern ll NUM_COMMANDS ;
+char *buffer;
+char HISTORYY[3000];
+char HISTORY[20][500];
+char curr_command[512];
+
+// PROCESS INFORMATION
 extern ll reversemapping[3000000];
 extern ll bgind;
 extern ll procaarray[30000];
-char characterarray[10000][100];
-
-char HISTORY[20][500];
 ll commandnumber ;
 ll suspendedjobnumber ;
 ll jobs[3000][2] ;
+ll nikal;
 ll naam;
-int pressedkey = 0;
-int numpressed = 0;
-char HISTORYY[3000];
-int parentid ;
+pid_t pid_of_shell;
+pid_t parentid ;
+int shellid;
+int sout;
+int sin;
+char characterarray[10000][100];
 // ll backgroundflag = 0;
 // ll foregroundflag = 0;

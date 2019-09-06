@@ -14,9 +14,11 @@ void prompt_display()
         perror("Error printing the username");
         exit(EXIT_FAILURE);
     }
+    char *username = NULL;
+    username = getenv("USER");
     printf(ANSI_BLUE_BG);
     printf(ANSI_WHITE);
-    printf("%s",b->pw_name);
+    printf("%s",username);
     printf(ANSI_RESET);
     printf("@");
     printf(ANSI_DARKBLUE_BG);

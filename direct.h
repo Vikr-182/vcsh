@@ -9,6 +9,8 @@
 #include "nightswatch.h"
 #include "jobs.h"
 #include "cronjob.h"
+#include "execute.h"
+#include "env.h"
 
 // ll pressedkey = 0;
 
@@ -17,248 +19,6 @@ ll reversemapping[3000000];
 ll bgind;
 ll procaarray[30000];
 
-void signal_handler();
-
-void redirect(char *argv)
-{
-	if (!argv)
-	{
-		return;
-	}
-
-	char **tokens = (char **)malloc(sizeof(char *) * MAX_TOKENS);
-	for (ll o = 0; o < MAX_TOKENS; o++)
-	{
-		tokens[o] = NULL;
-	}
-	char *line = (char *)malloc(sizeof(char) * (MAX_TOKENS));
-	line = strtok(argv, " ");
-	ll i = 0;
-	while (line != NULL)
-	{
-		tokens[i++] = line;
-		line = strtok(NULL, " ");
-	}
-	ll n = 0;
-
-	if (!strcmp(tokens[n], "vcsh"))							//			invoking shell
-	{
-		tokens[n] = (char *)malloc(sizeof(char) * 10);
-		strcpy(tokens[n], "./a.out"); 
-	}
-	if (!strcmp(tokens[n], "cd"))							// 			execute cd
-	{
-		cd_vcsh(tokens); 				
-	}
-	else if (!strcmp(tokens[n], "quit"))						// 			execute exit
-	{
-		quit(); 	
-	}
-
-	else if (!strcmp(tokens[n], "pwd"))
-	{
-		pwd_vcsh(); // 				execute pwd
-	}
-	else if (!strcmp(tokens[n], "echo"))
-	{
-		echo_vcsh(i - 1, tokens); //                    execute echo
-	}
-	else if (!strcmp(tokens[n], "pinfo"))
-	{
-		pinfo_vcsh(tokens,parentid); //                  execute cd
-	}
-	else if (!strcmp(tokens[n], "pwd"))
-	{
-		pwd_vcsh(); //                  execute pwd
-	}
-	else
-	{
-
-		ll askedinbg = 0;
-		ll findind = 0;
-		for (ll n = 0; n < i && !askedinbg; n++)
-		{
-			if (tokens[n][0] == '&' && strlen(tokens[n]) == 1)
-			{
-				askedinbg = 1; 
-				findind = n;
-			}
-		}
-		ll gh = 0;
-		ll find;
-		for (ll o = 0; !gh && o < strlen(argv); o++)
-		{
-			if (argv[o] == '&')
-			{
-				gh = 1;
-				find = o;
-			}
-		}
-		if (gh)
-		{
-			argv[find] = '\0';
-		}
-		if (askedinbg)
-		{
-			for (ll j = findind; j < i; j++)
-			{
-				tokens[j] = NULL;
-			}
-			i = findind;
-		}
-		if (!askedinbg) 
-		{
-			//			asked to execute in foreground
-			signal(SIGCHLD, signal_handler);
-			int pid = fork();
-			if (pid == 0)
-			{
-				if (!strcmp(tokens[n], "ls"))
-				{
-					ls_vcsh(i - 1, tokens); // 				execute ls
-				}
-				else if (!strcmp(tokens[n], "nightswatch"))
-				{
-					nightswatch(tokens); //                         execute nightswatch
-				}
-				else if(!strcmp(tokens[n],"jobs"))
-				{
-					showjobs();
-				}
-				else if (!strcmp(tokens[n], "history"))
-				{
-					char F[200]; //                         execute history
-					ll ind = 0;
-					for (ll q = 0; q < i; q++)
-					{
-						for (ll p = 0; p < strlen(tokens[q]); p++)
-						{
-							F[ind++] = tokens[q][p];
-						}
-						F[ind++] = ' ';
-					}
-					F[ind] = '\0';
-					// printf("%s\n",F);ls
-
-					history_vcsh(i, F, 1);
-				}
-				else if(!strcmp(tokens[n],"cronjob"))
-				{
-					vcsh_cronjob(tokens);
-				}
-				else
-				{
-					if (execvp(tokens[0], tokens) == -1)
-					{
-						perror("Erroor executing or wrong command\n");
-					}
-				}
-				exit(0);
-			}
-			else if (pid < 0)
-			{
-				perror("Error forking");
-			}
-			else
-			{
-				int status;
-				do
-				{
-					waitpid(pid, &status, WUNTRACED);
-				} while (!WIFEXITED(status) && !WIFSIGNALED(status));
-			}
-		}
-		else	
-		{
-			//			execute in background
-			signal(SIGCHLD, signal_handler);
-			printf("%s\n", argv);
-			for (ll i = 0; i < strlen(argv); i++)
-			{
-				characterarray[bgind][i] = argv[i];
-			}
-			int pid = fork();
-			suspendedjobnumber++;
-			if (pid == 0)
-			{
-				setpgid(0, 0);
-				if (!strcmp(tokens[n], "ls"))
-				{
-					ls_vcsh(i - 1, tokens); // 				execute ls
-				}
-				else if (!strcmp(tokens[n], "pwd"))
-				{
-					pwd_vcsh(); // 				execute pwd
-				}
-				else if (!strcmp(tokens[n], "echo"))
-				{
-					echo_vcsh(i - 1, tokens); //                    execute echo
-				}
-				else if (!strcmp(tokens[n], "pinfo"))
-				{
-					pinfo_vcsh(tokens,parentid); //                  execute cd
-				}
-				else if (!strcmp(tokens[n], "pwd"))
-				{
-					pwd_vcsh(); //                  execute pwd
-				}
-				else if (!strcmp(tokens[n], "nightswatch"))
-				{
-					nightswatch(tokens); //                         execute nightswatch
-				}
-				else if(!strcmp(tokens[n],"jobs"))
-				{
-					showjobs();
-				}
-				else if (!strcmp(tokens[n], "history"))
-				{
-					char F[200]; //                         execute history
-					ll ind = 0;
-					for (ll q = 0; q < i; q++)
-					{
-						for (ll p = 0; p < strlen(tokens[q]); p++)
-						{
-							F[ind++] = tokens[q][p];
-						}
-						F[ind++] = ' ';
-					}
-					F[ind] = '\0';
-					// printf("%s\n",F);ls
-
-					history_vcsh(i, F, 1);
-				}
-				else if(!strcmp(tokens[n],"cronjob"))
-				{
-					vcsh_cronjob(tokens);
-				}
-
-				else
-				{
-					if (execvp(tokens[0], tokens) == -1)
-					{
-						perror("Erroor executing or wrong command\n");
-					}
-				}
-				exit(0);
-			}
-			else if (pid < 0)
-			{
-				perror("Error forking");
-			}
-			else
-			{
-				procaarray[bgind] = pid;
-				bgind++;
-				strcpy(characterarray[pid], argv);
-				int status;
-				printf("Done %lld\n", suspendedjobnumber);
-				return;
-			}
-		}
-	}
-	free(tokens); // 			Free up the memory
-	free(line);
-}
 
 ll shell_loop()
 {
@@ -286,12 +46,18 @@ ll shell_loop()
 	}
 	printf("*******  Welcome to vcsh  \u263A  ***************\n");
 	signal(SIGCHLD, signal_handler);
+	signal(SIGINT,ctrlccross);
+	signal(SIGTSTP,ctrlzcross);		
+
 	rl_bind_key('\t',rl_complete);
-	parentid = getpid();
 	ll cl = 0;
 	ll beforepressed = 0;
 	while (1)
 	{
+		//			SET SHELL ID
+		shellid = getpid();
+		parentid = shellid;
+
 		// 			SET PWD
 		setpwd();
 
@@ -325,25 +91,54 @@ ll shell_loop()
 			prompt_display();
 			buffer[strlen(buffer)-1] = '\0';
 			printf("%s\n",buffer);
-			//printf("\r%s",buffer);
 		}
 		else if(!pressedkey)
 		{
 			history_vcsh(2, buffer, 0);
 		}
 		// 			PARSE THE INPUT
-		char **totalcommands = parse(buffer);
+		char **totalcommands = parse_by_colon(buffer);
 		for (ll n = 0; n <= NUM_COMMANDS; n++)
 		{
-			for (ll j = 0; j < strlen(totalcommands[n]); j++)
+			char **totalpipes = parse_by_pipe(totalcommands[n]);
+
+		// 			PIPE THE OUTPUT OF LAST TO FIRST ONE
+			int fdarray[2];
+			fdarray[0] = -1;
+			fdarray[1] = -1;
+			pipe(fdarray);
+			/*
+			for(int j=0;j <= NUM_PIPES; j++)
 			{
-				HISTORY[commandnumber][j] = totalcommands[n][j];
+				int pid = fork();
+				if(pid<0)
+				{
+					perror("Error forking");
+				}
+				else if(pid==0)
+				{
+					dup2(sin,0);	// Make child read from stdin
+					dup2(fdarray[1],1); // Make child write to pipe
+					close(fdarray[0]);
+					redirect(totalpipes[j]);
+					exit(2);
+				}
+				else
+				{
+					wait(NULL);
+					close(fdarray[1]);
+					sin = fdarray[0];  // Make parent read from pipe
+				}
+				printf("|%s|",totalpipes[j]);
 			}
-			HISTORY[commandnumber][strlen(totalcommands[n])] = '\0';
-			commandnumber++;
-			commandnumber %= 20;
+			// Restore stdout and stdin
+			redirect(totalpipes[NUM_PIPES]);
+			dup2(sout,1);
+			dup2(sin,0);*/
+			strcpy(curr_command,totalcommands[n]);
 			redirect(totalcommands[n]);
 			signal(SIGCHLD, signal_handler);
+			updatejobs();
 			setpwd();
 			resize();
 		}
@@ -353,30 +148,3 @@ ll shell_loop()
 	return EXIT_FAILURE;
 }
 
-void signal_handler()
-{
-	int c;
-	ll mil = 0;
-	ll io = 0;
-	for (ll i = 0; !mil && i < bgind; i++)
-	{
-		int r = waitpid(procaarray[i], &c, WNOHANG | WUNTRACED);
-		resize();
-		if (procaarray[i] == r)
-		{
-			if (WIFEXITED(c))
-			{
-				resize();
-				printf("|%s|%lld exited normally with status %lld\n", characterarray[r], procaarray[i], c);
-			}
-			else if (WIFSIGNALED(c))
-			{
-				resize();
-				printf("|%s|%lld exited with status %lld\n", characterarray[r], procaarray[i], c);
-			}
-			mil = 1;
-			io = i;
-		}
-	}
-	//signal(SIGCHLD, signal_handler);
-}

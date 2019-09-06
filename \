@@ -154,14 +154,14 @@ void redirect(char *argv)
 			}
 			else
 			{
-				parentid = pid;
+				parentid = getpid();
 				printf("Parent ins %ld and child is %ld\n",parentid,pid);
 				int status;
-				do
+				/*do
 				{
 					waitpid(pid, &status, WUNTRACED);
-				} while (!WIFEXITED(status) && !WIFSIGNALED(status) && !nikal);
-				//wait(NULL);
+				} while (!WIFEXITED(status) && !WIFSIGNALED(status));*/
+				wait(NULL);
 			}
 		}
 		else	
@@ -243,7 +243,7 @@ void redirect(char *argv)
 			}
 			else
 			{
-				parentid = pid;
+				parentid = getpid();
 				printf("Parent ins %ld and child is %ld\n",parentid,pid);
 				procaarray[bgind] = pid;
 				bgind++;
