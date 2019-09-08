@@ -1,3 +1,14 @@
+void redirect_simple(char *argv)
+{
+	char ** lt = parse_by_delim(argv,">>");	
+	char ** commands = (char **)malloc(sizeof(char *)*MAX_TOKENS);
+	int ind = 0;
+	int mapping[10000];
+	for(ll i=0;lt[i];i++)
+	{
+		char **ge = parse_by_delim(lt[i],"<");
+	}
+}
 
 
 void redirect(char *argv)
@@ -61,7 +72,22 @@ void redirect(char *argv)
         {
                 unset(tokens);
         }
-
+	else if(!(strcmp(tokens[n],"fg")))
+        {
+                fg(tokens);
+        }
+        else if(!(strcmp(tokens[n],"bg")))
+        {
+                bg(tokens);
+        }
+        else if(!(strcmp(tokens[n],"kjob")))
+        {
+                kill_job(tokens);
+        }
+        else if(!(strcmp(tokens[n],"overkill")))
+        {
+                overkill();
+        }
 	else
 	{
 
@@ -105,14 +131,10 @@ void redirect(char *argv)
 			if (pid == 0)
 			{
 				signal(SIGINT,SIG_DFL);
-				printf("Mai hu chld meri pid hai %ld\n",getpid());
+//				printf("Mai hu chld meri pid hai %ld\n",getpid());
 				if (!strcmp(tokens[n], "ls"))
 				{
 					ls_vcsh(i - 1, tokens); // 				execute ls
-				}
-				else if (!strcmp(tokens[n], "nightswatch"))
-				{
-					nightswatch(tokens); //                         execute nightswatch
 				}
 				else if(!strcmp(tokens[n],"jobs"))
 				{
@@ -146,7 +168,7 @@ void redirect(char *argv)
 						perror("Erroor executing or wrong command\n");
 					}
 				}
-				exit(0);
+				exit(1);
 			}
 			else if (pid < 0)
 			{
@@ -155,7 +177,7 @@ void redirect(char *argv)
 			else
 			{
 				parentid = pid;
-				printf("Parent ins %ld and child is %ld\n",parentid,pid);
+//				printf("Parent ins %ld and child is %ld\n",parentid,pid);
 				int status;
 				do
 				{
@@ -199,10 +221,6 @@ void redirect(char *argv)
 				else if (!strcmp(tokens[n], "pwd"))
 				{
 					pwd_vcsh(); //                  execute pwd
-				}
-				else if (!strcmp(tokens[n], "nightswatch"))
-				{
-					nightswatch(tokens); //                         execute nightswatch
 				}
 				else if(!strcmp(tokens[n],"jobs"))
 				{
@@ -249,7 +267,7 @@ void redirect(char *argv)
 				bgind++;
 				strcpy(characterarray[pid], argv);
 				int status;
-				printf("Done %lld\n", suspendedjobnumber);
+				printf("Done %lld\n",bgind-1);
 				return;
 			}
 		}

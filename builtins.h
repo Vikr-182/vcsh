@@ -253,6 +253,7 @@ void echo_vcsh(ll argc, char *argv[])
 
 void quit()
 {
+	printf("Mai yahan aaya%d\n",getpid());
 	exit(0);
 }
 

@@ -12,9 +12,6 @@
 #include <errno.h>
 #include <grp.h>
 #include <termios.h>
-#include <curses.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 
 
 typedef long long ll;
@@ -74,8 +71,10 @@ ll naam;
 pid_t pid_of_shell;
 pid_t parentid ;
 int shellid;
-int sout;
-int sin;
+int glob_out;
+int glob_in;
+int save_out;
+int save_in;
 char characterarray[10000][100];
 // ll backgroundflag = 0;
 // ll foregroundflag = 0;

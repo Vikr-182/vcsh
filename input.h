@@ -34,6 +34,7 @@ char *input()
 		strcpy(A,"clear");
 		A[6] = '\0';
 	}
+	//printf("I got input %s\n",A);
 	return A;
 }
 
@@ -44,7 +45,7 @@ char **parse_by_colon(char *line)
 	{
 		perror("Error allocating the memory");
 		exit(EXIT_FAILURE);
-	
+	}	
 	char *indv;
 	indv = strtok(line, ";");
 	ll i = 0;
@@ -99,3 +100,26 @@ char **parse_by_space(char *line)
 	NUM_PIPES = i - 1;
 	return commands;
 }
+
+char **parse_by_delim(char *line,char *delim)
+{ //              PARSES COMMANDS BY DELIM
+        char **commands = malloc(sizeof(char *) * (MAX_COMMANDS));
+        if (!commands)
+        {
+                perror("Error allocating the memory");
+                exit(EXIT_FAILURE);
+        }
+        char *indv;
+        indv = strtok(line, delim);
+        ll i = 0;
+        while (indv)
+        {
+                commands[i] = indv;
+                i++;
+                indv = strtok(NULL, delim);
+        }
+        NUM_PIPES = i - 1;
+        return commands;
+}
+
+

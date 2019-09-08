@@ -6,11 +6,11 @@
 #include "clear.h"
 #include "history.h"
 #include "pinfo.h"
-#include "nightswatch.h"
 #include "jobs.h"
 #include "cronjob.h"
 #include "execute.h"
 #include "env.h"
+#include "jobs_commands.h"
 
 // ll pressedkey = 0;
 
@@ -49,9 +49,10 @@ ll shell_loop()
 	signal(SIGINT,ctrlccross);
 	signal(SIGTSTP,ctrlzcross);		
 
-	rl_bind_key('\t',rl_complete);
 	ll cl = 0;
 	ll beforepressed = 0;
+	save_out = dup(1);			// SAVE OUTPUT
+	save_in = dup(0);			// SAVE INPUT
 	while (1)
 	{
 		//			SET SHELL ID
@@ -100,43 +101,65 @@ ll shell_loop()
 		char **totalcommands = parse_by_colon(buffer);
 		for (ll n = 0; n <= NUM_COMMANDS; n++)
 		{
+			strcpy(curr_command,totalcommands[n]);
 			char **totalpipes = parse_by_pipe(totalcommands[n]);
-
-		// 			PIPE THE OUTPUT OF LAST TO FIRST ONE
+			//printf("%s %s %s\n",totalpipes[0],totalpipes[1],totalpipes[2]);
+			printf("%s\n",totalpipes[0]);
+			// 			PIPE THE OUTPUT OF LAST TO FIRST ONE
 			int fdarray[2];
 			fdarray[0] = -1;
 			fdarray[1] = -1;
-			pipe(fdarray);
-			/*
-			for(int j=0;j <= NUM_PIPES; j++)
+
+			printf("NUM_PIPES = %lld\n",NUM_PIPES);
+			if(NUM_PIPES>=1)
 			{
-				int pid = fork();
-				if(pid<0)
+				for(int j=0;j <= NUM_PIPES; j++)
 				{
-					perror("Error forking");
+					pipe(fdarray);
+					if(j==0)
+						write(save_out,"Hi",2);
+					else
+					{		
+						write(save_out,"R",1);
+						write(save_out,totalpipes[j],strlen(totalpipes[j]));				
+					}
+
+					int pid = fork();
+					if(pid<0)
+					{
+						perror("Error forking");
+					}
+					else if(pid==0)
+					{
+						if(j!=NUM_PIPES)
+						{
+							close(1);		// Close stdout so that it is assigned to fdarray[1]
+							dup(fdarray[1]);	// Now child will write to a copy of fdarray[1]
+							close(fdarray[1]);	// Close the original fdarray[1]
+						}
+						close(0);		// Close stdin  so that it is assigned to fdarray[0]
+						dup(glob_in);		// Now child will read from a copy of fdarray[0]
+						close(fdarray[0]);	// Close the original fdarray[0]
+						if(j==1)
+						{
+							write(save_out,totalpipes[j],strlen(totalpipes[j]));				
+							write(save_out,"jk",2);
+						}
+						redirect(totalpipes[j]);
+						exit(1);
+					}
+					else
+					{
+						wait(NULL);
+						close(fdarray[1]);		// Close fdarray[1] as only child will write to it
+						glob_in = fdarray[0];  		// Make parent read from pipe
+					}
 				}
-				else if(pid==0)
-				{
-					dup2(sin,0);	// Make child read from stdin
-					dup2(fdarray[1],1); // Make child write to pipe
-					close(fdarray[0]);
-					redirect(totalpipes[j]);
-					exit(2);
-				}
-				else
-				{
-					wait(NULL);
-					close(fdarray[1]);
-					sin = fdarray[0];  // Make parent read from pipe
-				}
-				printf("|%s|",totalpipes[j]);
 			}
-			// Restore stdout and stdin
-			redirect(totalpipes[NUM_PIPES]);
-			dup2(sout,1);
-			dup2(sin,0);*/
-			strcpy(curr_command,totalcommands[n]);
-			redirect(totalcommands[n]);
+			else
+			{
+				redirect(totalcommands[n]);
+			}
 			signal(SIGCHLD, signal_handler);
 			updatejobs();
 			setpwd();
