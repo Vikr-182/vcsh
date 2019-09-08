@@ -1,15 +1,206 @@
-void redirect_simple(char *argv)
+void parse_it(char *argv)
 {
-	char ** lt = parse_by_delim(argv,">>");	
-	char ** commands = (char **)malloc(sizeof(char *)*MAX_TOKENS);
-	int ind = 0;
-	int mapping[10000];
-	for(ll i=0;lt[i];i++)
+	char **tot = (char **)malloc(sizeof(char *)*512);
+	for(ll k=0;k<200;k++)
 	{
-		char **ge = parse_by_delim(lt[i],"<");
+		tot[k] = (char *)malloc(sizeof(char)*100);
+	}
+	ll start = 0;
+	ll end = 0;
+	ll ind = 0;
+	char ** er = (char **)malloc(sizeof(char *)*512);
+	for(ll k=0;k<200;k++)
+	{
+		er[k] = (char *)malloc(sizeof(char )*100);
+	}
+	ll di = 0;
+	ll op = 0;
+	while(ind < strlen(argv))
+	{
+		if((ind < strlen(argv)-1) && argv[ind]=='>' && argv[ind+1]=='>')
+		{
+			op = 43;        // Random arbitary number
+			end = ind-1;
+			er[di] = (char *)malloc(sizeof(char )*100);
+			for(ll i=start;i<=end;i++)
+			{
+				er[di][i-start] = argv[i];
+			}
+			er[di][end-start+1] = '\0';
+			di++;
+			start = ind+2;
+			ind++;
+		}
+		else if((ind < strlen(argv)-1) && argv[ind]=='>' && argv[ind+1]!='>')
+		{
+			op = 45;        // Random arbitary number
+			end = ind-1;
+			er[di] = (char *)malloc(sizeof(char )*100);
+			for(ll i=start;i<=end;i++)
+			{
+				er[di][i-start] = argv[i];
+			}
+			er[di][end-start+1] = '\0';
+			di++;
+			start = ind+1;
+			ind++;
+		}
+		else
+		{
+			// do nothing
+		}
+		ind++;
+	}
+	end = ind-1;
+	for(ll i=start;i<=end;i++)
+	{
+		er[di][i-start] = argv[i];
+	}
+	er[di][end-start+1] = '\0';
+	di++;
+	ll tin = 0;
+	ll lt_exists = 0;
+	for(ll f=0;f<di;f++)
+	{
+		// Parse each string by "<"
+		start = 0;
+		end = 0;
+		for(ll o=0;o<strlen(er[f]);o++)
+		{
+			if(er[f][o]=='<')
+			{
+				lt_exists = 1;
+				end = o-1;
+				tot[tin] = (char *)malloc(sizeof(char )*100);
+				for(ll b=start;b<=end;b++)
+				{
+					tot[tin][b-start] = er[f][b];
+				}
+				tot[tin][end-start+1] = '\0';
+				tin++;
+				start = o+1;
+			}
+			else
+			{
+				//		printf("Na\n");
+			}
+		}
+		end = strlen(er[f])-1;
+		tot[tin] = (char *)malloc(sizeof(char )*100);
+		for(ll b=start;b<=end;b++)
+		{
+			tot[tin][b-start] = er[f][b];
+		}
+		tot[tin][end-start+1] = '\0';
+		tin++;
+	}
+	for(ll u=0;u<tin;u++){printf(";%s;",tot[u]);}
+	// op = 43 implies '>>'
+	if(!lt_exists && !op)
+	{
+		redirect(argv);
+		return;
+	}
+	int status;
+	pid_t pid = fork();
+	if(pid<0){perror("Forking error\n");}
+	if(pid==0)
+	{
+		if(lt_exists && op)
+		{
+			// Do both input and output
+			if(op==43)
+			{
+				int fd2 = open(tot[1],O_RDONLY);			// Use this file for reading only
+				if(fd2<0)
+				{
+					perror("Can't open\n");
+				}
+
+				int fd3 = open(tot[2],O_WRONLY|O_APPEND|O_CREAT,0644); 		// Write to here
+				if(fd3<0)
+				{
+					perror("Can't open\n");
+				}
+
+				// Now redirect stdin of first command such that it reads from fd2 and appends to fd3
+				dup2(fd2,0);					// Make it read from fd2
+				dup2(fd3,1);					// Make it write to fd3
+				redirect(tot[0]);
+				close(fd2);
+				close(fd3);
+			}
+			else
+			{
+				int fd2 = open(tot[1],O_RDONLY);                  // Use this file for reading only
+				if(fd2<0)
+				{
+					perror("Can't open\n");
+				}
+
+				int fd3 = open(tot[2],O_WRONLY|O_TRUNC |O_CREAT,0644);                 // Write to here
+				if(fd3<0)
+				{
+					perror("Can't open\n");
+				}
+
+
+				// Now redirect stdin of first command such that it reads from fd2 and appends to fd3
+				dup2(fd2,0);					// Make it read from fd2
+				close(fd2);
+				dup2(fd3,1);					// Make it write to fd3
+				close(fd3);
+				redirect(tot[0]);
+			}
+		}
+		else if(lt_exists && !op)
+		{
+			// Do only input 
+			int fd2 = open(tot[1],O_RDONLY);                  // Use this file for reading only
+			if(fd2<0)
+			{
+				perror("Cant open\n");
+			}
+
+			// Now redirect stdin of first command such that it reads from fd2 and appends to fd3
+			dup2(fd2,0);
+			close(fd2);
+			redirect(tot[0]);
+		}
+		else if(!lt_exists && op)
+		{
+			// Do only output
+			printf("JHi ra %s\n",tot[1]);
+			if(op==43)
+			{
+				int fd3 = open(tot[1],O_WRONLY|O_APPEND|O_CREAT,0644);                 // Write to here
+				if(fd3<0)
+				{
+					perror("Can't open\n");
+				}
+				dup2(fd3,1);
+				close(fd3);
+				redirect(tot[0]);
+			}
+			else
+			{
+				int fd3 = open(tot[1],O_WRONLY|O_TRUNC|O_CREAT,0644);                 // Write to here
+				if(fd3<0)
+				{
+					perror("Can't open\n");
+				}
+				dup2(fd3,1);
+				close(fd3);
+				redirect(tot[0]);
+			}
+		}
+		exit(0);
+	}
+	else
+	{
+		while (!(wait(&status) == pid)) ;
 	}
 }
-
 
 void redirect(char *argv)
 {
@@ -69,25 +260,25 @@ void redirect(char *argv)
 		set_env(tokens);
 	}
 	else if(!strcmp(tokens[n],"unset"))
-        {
-                unset(tokens);
-        }
+	{
+		unset(tokens);
+	}
 	else if(!(strcmp(tokens[n],"fg")))
-        {
-                fg(tokens);
-        }
-        else if(!(strcmp(tokens[n],"bg")))
-        {
-                bg(tokens);
-        }
-        else if(!(strcmp(tokens[n],"kjob")))
-        {
-                kill_job(tokens);
-        }
-        else if(!(strcmp(tokens[n],"overkill")))
-        {
-                overkill();
-        }
+	{
+		fg(tokens);
+	}
+	else if(!(strcmp(tokens[n],"bg")))
+	{
+		bg(tokens);
+	}
+	else if(!(strcmp(tokens[n],"kjob")))
+	{
+		kill_job(tokens);
+	}
+	else if(!(strcmp(tokens[n],"overkill")))
+	{
+		overkill();
+	}
 	else
 	{
 
@@ -131,7 +322,7 @@ void redirect(char *argv)
 			if (pid == 0)
 			{
 				signal(SIGINT,SIG_DFL);
-//				printf("Mai hu chld meri pid hai %ld\n",getpid());
+				//				printf("Mai hu chld meri pid hai %ld\n",getpid());
 				if (!strcmp(tokens[n], "ls"))
 				{
 					ls_vcsh(i - 1, tokens); // 				execute ls
@@ -177,7 +368,7 @@ void redirect(char *argv)
 			else
 			{
 				parentid = pid;
-//				printf("Parent ins %ld and child is %ld\n",parentid,pid);
+				//				printf("Parent ins %ld and child is %ld\n",parentid,pid);
 				int status;
 				do
 				{
