@@ -34,7 +34,6 @@ char *input()
 		strcpy(A,"clear");
 		A[6] = '\0';
 	}
-	//printf("I got input %s\n",A);
 	return A;
 }
 
@@ -101,6 +100,29 @@ char **parse_by_space(char *line)
 	return commands;
 }
 
+char **parse_by_less(char *line)
+{ //              PARSES COMMANDS BY DELIM
+        char **commands = malloc(sizeof(char *) * (MAX_COMMANDS));
+        if (!commands) 
+        {
+                perror("Error allocating the memory");
+                exit(EXIT_FAILURE);
+        }
+        char *indv;
+        indv = strtok(line, "<");
+        ll i = 0;
+	char D[200000];
+        while (printf("%s\n",indv) && indv)
+        {
+                commands[i] = indv;
+                i++;
+                indv = strtok(NULL, "<");
+        }
+        return commands;
+}
+
+
+
 char **parse_by_delim(char *line,char *delim)
 { //              PARSES COMMANDS BY DELIM
         char **commands = malloc(sizeof(char *) * (MAX_COMMANDS));
@@ -118,7 +140,6 @@ char **parse_by_delim(char *line,char *delim)
                 i++;
                 indv = strtok(NULL, delim);
         }
-        NUM_PIPES = i - 1;
         return commands;
 }
 

@@ -1,3 +1,10 @@
+void removefromloop()
+{
+	printf("Lo mai aaya %ld\n",getpid());
+	lekarle = 1;	
+}
+
+
 void parse_it(char *argv)
 {
 	char **tot = (char **)malloc(sizeof(char *)*512);
@@ -94,7 +101,6 @@ void parse_it(char *argv)
 		tot[tin][end-start+1] = '\0';
 		tin++;
 	}
-	for(ll u=0;u<tin;u++){printf(";%s;",tot[u]);}
 	// op = 43 implies '>>'
 	if(!lt_exists && !op)
 	{
@@ -170,7 +176,6 @@ void parse_it(char *argv)
 		else if(!lt_exists && op)
 		{
 			// Do only output
-			printf("JHi ra %s\n",tot[1]);
 			if(op==43)
 			{
 				int fd3 = open(tot[1],O_WRONLY|O_APPEND|O_CREAT,0644);                 // Write to here
@@ -306,6 +311,7 @@ void redirect(char *argv)
 		{
 			argv[find] = '\0';
 		}
+		
 		if (askedinbg)
 		{
 			for (ll j = findind; j < i; j++)
@@ -313,6 +319,11 @@ void redirect(char *argv)
 				tokens[j] = NULL;
 			}
 			i = findind;
+		}
+
+		if(!strcmp(tokens[n],"cronjob"))
+		{
+			askedinbg = 1;								//			execute in background
 		}
 		if (!askedinbg) 
 		{
@@ -347,10 +358,6 @@ void redirect(char *argv)
 					// printf("%s\n",F);ls
 
 					history_vcsh(i, F, 1);
-				}
-				else if(!strcmp(tokens[n],"cronjob"))
-				{
-					vcsh_cronjob(tokens);
 				}
 				else
 				{
@@ -391,8 +398,9 @@ void redirect(char *argv)
 			if (pid == 0)
 			{
 				signal(SIGINT,SIG_DFL);
-				setpgid(0, 0);
+				//setpgid(0, 0);
 				signal(SIGTSTP,ctrlzcross);		
+				printf("Mai hun child meri pid hai %ld\n",getpid());
 				if (!strcmp(tokens[n], "ls"))
 				{
 					ls_vcsh(i - 1, tokens); // 				execute ls
@@ -453,11 +461,12 @@ void redirect(char *argv)
 			else
 			{
 				parentid = pid;
-				printf("Parent ins %ld and child is %ld\n",parentid,pid);
 				procaarray[bgind] = pid;
+				gidarray[bgind] = getpgid(pid);
 				bgind++;
 				strcpy(characterarray[pid], argv);
 				int status;
+				kill(pid,SIGTTIN);				
 				printf("Done %lld\n",bgind-1);
 				return;
 			}

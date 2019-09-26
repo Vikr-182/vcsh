@@ -49,6 +49,7 @@ ll shell_loop()
 	signal(SIGINT,ctrlccross);
 	signal(SIGTSTP,ctrlzcross);		
 
+	shell_gid = getpgid(getpid());
 	ll cl = 0;
 	ll beforepressed = 0;
 	save_out = dup(1);			// SAVE OUTPUT
@@ -91,7 +92,6 @@ ll shell_loop()
 			strcpy(buffer,BUF[cnt-numpressed]);
 			prompt_display();
 			buffer[strlen(buffer)-1] = '\0';
-			printf("%s\n",buffer);
 		}
 		else if(!pressedkey)
 		{
@@ -103,27 +103,16 @@ ll shell_loop()
 		{
 			strcpy(curr_command,totalcommands[n]);
 			char **totalpipes = parse_by_pipe(totalcommands[n]);
-			//printf("%s %s %s\n",totalpipes[0],totalpipes[1],totalpipes[2]);
-			printf("{%s}\n",totalpipes[0]);
 			// 			PIPE THE OUTPUT OF LAST TO FIRST ONE
 			int fdarray[2];
 			fdarray[0] = -1;
 			fdarray[1] = -1;
 
-			printf("NUM_PIPES = %lld\n",NUM_PIPES);
 			if(NUM_PIPES>=1)
 			{
 				for(int j=0;j <= NUM_PIPES; j++)
 				{
 					pipe(fdarray);
-					if(j==0)
-						write(save_out,"Hi",2);
-					else
-					{		
-						write(save_out,"R",1);
-						write(save_out,totalpipes[j],strlen(totalpipes[j]));				
-					}
-
 					int pid = fork();
 					if(pid<0)
 					{
@@ -140,11 +129,6 @@ ll shell_loop()
 						close(0);		// Close stdin  so that it is assigned to fdarray[0]
 						dup(glob_in);		// Now child will read from a copy of fdarray[0]
 						close(fdarray[0]);	// Close the original fdarray[0]
-						if(j==1)
-						{
-							write(save_out,totalpipes[j],strlen(totalpipes[j]));				
-							write(save_out,"jk",2);
-						}
 						parse_it(totalpipes[j]);
 						exit(1);
 					}
@@ -158,141 +142,6 @@ ll shell_loop()
 			}
 			else
 			{
-				/*
-				char **tot = (char **)malloc(sizeof(char *)*512);
-				for(ll k=0;k<200;k++)
-				{
-					tot[k] = (char *)malloc(sizeof(char)*100);
-				}
-				ll start = 0;
-				ll end = 0;
-				ll ind = 0;
-				char ** er = (char **)malloc(sizeof(char *)*512);
-				for(ll k=0;k<200;k++)
-				{
-					er[k] = (char *)malloc(sizeof(char )*100);
-				}
-				ll di = 0;
-				char argv[2000];
-				strcpy(argv,totalcommands[n]);
-				argv[strlen(totalcommands[n])] = '\0';
-				printf("Muje %s %lld\n",argv,strlen(argv));
-				ll op = 0;
-				while(ind < strlen(argv))
-				{
-					if((ind < strlen(argv)-1) && argv[ind]=='>' && argv[ind+1]=='>')
-					{
-						op = 43; 	// Random arbitary number
-						end = ind-1;
-						er[di] = (char *)malloc(sizeof(char )*100);
-						printf(",::%lld %lld::.",start,end);
-						for(ll i=start;i<=end;i++)
-						{
-							er[di][i-start] = argv[i];
-						}
-						er[di][end-start+1] = '\0';
-						di++;
-						start = ind+2;
-						ind++;
-					}
-					else if((ind < strlen(argv)-1) && argv[ind]=='>' && argv[ind+1]!='>')
-					{
-						op = 45;	// Random arbitary number
-						end = ind-1;
-						er[di] = (char *)malloc(sizeof(char )*100);
-						printf(",::%lld %lld::.",start,end);
-						for(ll i=start;i<=end;i++)
-						{
-							er[di][i-start] = argv[i];
-						}
-						er[di][end-start+1] = '\0';
-						di++;
-						start = ind+2;
-						ind++;
-					}
-					else
-					{
-						// do nothing
-					}
-					ind++;
-				}
-				end = ind-1;
-
-				printf(",:%lld %lld:.",start,end);
-				for(ll i=start;i<=end;i++)
-				{
-					er[di][i-start] = argv[i];
-				}
-				er[di][end-start+1] = '\0';
-				printf("Ko |%s| %lld\n",er[di],di);
-				di++;
-				ll tin = 0;
-				for(ll f=0;f<di;f++)
-				{
-					printf("[%s]]\n",er[f]);
-					// Parse each string by "<"
-					start = 0;
-					end = 0;
-					for(ll o=0;o<strlen(er[f]);o++)
-					{
-						if(er[f][o]=='<')
-						{
-							end = o-1;
-							tot[tin] = (char *)malloc(sizeof(char )*100);
-							printf(":%lld %lld:",start,end);
-							for(ll b=start;b<=end;b++)
-							{
-								tot[tin][b-start] = er[f][b];
-							}	
-							tot[tin][end-start+1] = '\0';
-							printf("?%s?\n",tot[tin]);
-							tin++;
-							start = o+1;
-						}
-						else
-						{
-							printf("Na\n");
-						}
-					}
-					end = strlen(er[f])-1;
-					tot[tin] = (char *)malloc(sizeof(char )*100);
-					printf(":%lld %lld:",start,end);
-					for(ll b=start;b<=end;b++)
-					{
-						tot[tin][b-start] = er[f][b];
-					}
-					tot[tin][end-start+1] = '\0';
-					printf("?%s?\n",tot[tin]);
-					tin++;
-				}
-				printf(":%lld %lld:",start,end);
-				ll lt_exists;
-				for(ll f=0;f<tin;f++)
-				{
-					if(lt_exists && op != 0)
-					{
-						// Do both input and output
-
-					}
-					else if(lt_exists && !op)
-					{
-						// Do only input
-
-					}
-					else if(!op)
-					{
-						// Do only output
-
-					}
-					else
-					{
-						// Nothing exists
-						redirect(argv);
-					}
-
-				}
-				printf("%lldjj\n",tin);
-				printf("Ho gaya\n");*/
 				parse_it(totalcommands[n]);
 			}
 			signal(SIGCHLD, signal_handler);

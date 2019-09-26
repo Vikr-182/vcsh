@@ -1,3 +1,4 @@
+
 void ctrlccross()
 {
 	/*
@@ -29,6 +30,7 @@ void ctrlzcross()
 	{
 		pid = parentid;
 		procaarray[bgind] = parentid;	
+		gidarray[bgind] = getpgid(parentid);
 		strcpy(characterarray[pid],curr_command);
 		printf("%lld+\tStopped\t%s\n",bgind+1,curr_command);
 		bgind++;
@@ -98,6 +100,7 @@ void updatejobs()
 			for(int g=r+1;g<bgind;g++)
 			{
 				procaarray[g-1] = procaarray[g];
+				gidarray[g-1] = gidarray[g];
 			}
 			bgind--;
 		}
