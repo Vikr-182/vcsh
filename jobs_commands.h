@@ -46,15 +46,19 @@ void fg(char **tokens)
 	}
 	bgind--;
 	pid_t pid = procaarray[jno];
+	char temp[300000];
+	strcpy(temp,characterarray[jno]);
 
 	/* Capture the terminal attributes in a struct termios file */
 	
+	/*
 	struct termios term1,term2;
 	if(tcgetattr(0,&term1)!=0)
 	{
 		printf("Error transfering control\n");
 		return ;
 	}
+	*/
 	/*
 	if(tcgetattr(1,&term2)!=0)
 	{
@@ -100,7 +104,7 @@ void fg(char **tokens)
 	{
 		waitpid(pid,&status,WUNTRACED);
 	}
-	while(!WIFEXITED(status) && !WIFSIGNALED(status) );
+	while(!WIFEXITED(status) && !WIFSIGNALED(status) && !nikal );
 	if(WIFEXITED(status))
 	{
 		printf("Lo\n");
@@ -109,12 +113,15 @@ void fg(char **tokens)
 	{
 		printf("Fo\n");
 	}
-	else if(WIFSTOPPED(status))
+	else if(nikal == 1)
 	{
-		printf("Go\n");
-	}
+		// Again given Ctrl+Z command
+		printf("olo\n");
+		procaarray[bgind] = pid;
+		strcpy(characterarray[bgind],temp);
+		bgind++;
+	}	
 
-	/* Return back controlling terminal from process to shell */
 	/*
 	tcsetpgrp(0,shell_gid);
 	tcsetpgrp(1,shell_gid);
@@ -144,39 +151,22 @@ void bg(char **tokens)
 		return;
 	}
 	ll jno = convert(tokens[1]);
-	if(jno >= bgind){
+	printf("Ji Ra\n");
+	if(jno >= bgind)
+	{
 		printf("Please provide correct job number\n");
+		return ;
 	}
 	pid_t pid = procaarray[jno];
 	kill(pid,SIGCONT);
 	updatejobs();
 }
 
-void kill_job(char **tokens)
+void kill_job(ll jno,ll sig)
 {
-	if(tokens[3])
-	{
-		printf("Please provide the correct number of arguments\n");
-	}
-	else if(!tokens[1]||!tokens[2])
-	{
-		printf("Please provide all arguments\n");
-		return;
-	}
-	ll jno = convert(tokens[1]);
-	if(jno >= bgind){
-		printf("Please provide correct job number\n");
-	}
-	ll sig = convert(tokens[2]);
 	pid_t pid = procaarray[jno];
 	kill(pid,sig);
+	printf("Killed %ld\n",pid);
+	updatejobs();
 }
 
-void overkill()
-{
-	for(ll j=0;j<bgind;j++)
-	{
-		kill(procaarray[j],SIGINT);
-	}
-	bgind = 0;
-}

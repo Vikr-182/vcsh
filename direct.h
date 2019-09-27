@@ -48,6 +48,7 @@ ll shell_loop()
 	signal(SIGCHLD, signal_handler);
 	signal(SIGINT,ctrlccross);
 	signal(SIGTSTP,ctrlzcross);		
+	signal(SIGQUIT,sigquit);
 
 	shell_gid = getpgid(getpid());
 	ll cl = 0;
@@ -151,6 +152,8 @@ ll shell_loop()
 		}
 		pressedkey = 0;
 
+		nikal = 0;
+		iscronjob = 0;
 	}
 	return EXIT_FAILURE;
 }

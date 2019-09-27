@@ -278,48 +278,11 @@ void redirect(char *argv)
 	}
 	else if(!(strcmp(tokens[n],"kjob")))
 	{
-		if(tokens[3])
-		{
-			printf("Please provide the correct number of arguments\n");
-		}
-		else if(!tokens[1]||!tokens[2])
-		{
-			printf("Please provide all arguments\n");
-			return;
-		}
-		ll jno = 0;
-		ll p = 1;
-		for(ll j=0;j<strlen(tokens[1]);j++)
-		{
-			jno += p*(tokens[1][strlen(tokens[1])-1-j]-'0');
-			p *= 10;
-		}
-		printf("Got jon as %lld\n",jno);
-		if(jno >= bgind){
-			printf("Please provide correct job number\n");
-			return ;
-		}
-		 ll sig = 0;
-                p = 1;
-                for(ll j=0;j<strlen(tokens[2]);j++)
-                {
-                        sig += p*(tokens[2][strlen(tokens[2])-1-j]-'0');
-			p *= 10;
-                }
-                printf("Got sig as %lld\n",sig);
-		kill_job(jno,sig);
+		kill_job(tokens);
 	}
 	else if(!(strcmp(tokens[n],"overkill")))
 	{
-		ll j = bgind;
-		ll prev = bgind;
-		while(j>0)
-		{
-			kill_job(0,9);
-			while(prev==bgind);
-			prev = bgind;
-			j--;
-		}
+		overkill();
 	}
 	else
 	{
@@ -360,7 +323,6 @@ void redirect(char *argv)
 
 		if(!strcmp(tokens[n],"cronjob"))
 		{
-			iscronjob = 1;
 			askedinbg = 1;								//			execute in background
 		}
 		if (!askedinbg) 
@@ -419,26 +381,6 @@ void redirect(char *argv)
 				{
 					waitpid(pid, &status, WUNTRACED);
 				} while (!WIFEXITED(status) && !WIFSIGNALED(status) && !nikal);
-				if(nikal)
-				{
-					printf("Caught signal %ld\n",pid);
-					pid_t pid = getpid();
-					if( (pid != shellid ) )
-					{
-						printf("Rara\n");
-						return;
-					}
-					else if(parentid>0)
-					{
-						pid = parentid;
-						procaarray[bgind] = parentid;
-						gidarray[bgind] = getpgid(parentid);
-						strcpy(characterarray[pid],curr_command);
-						printf("%lld+\tStopped\t%s\n",bgind+1,curr_command);
-						bgind++;
-						updatejobs();
-					}
-				}
 				//wait(NULL);
 			}
 		}
@@ -518,10 +460,6 @@ void redirect(char *argv)
 			}
 			else
 			{
-				if(iscronjob)
-				{
-					pid_cronjob = pid;
-				}
 				parentid = pid;
 				procaarray[bgind] = pid;
 				gidarray[bgind] = getpgid(pid);
@@ -530,13 +468,9 @@ void redirect(char *argv)
 				int status;
 				kill(pid,SIGTTIN);				
 				printf("Done %lld\n",bgind-1);
+				return;
 			}
 		}
-	}
-	printf("Rara %ld\n",pid_cronjob);
-	if(iscronjob)
-	{
-		kill(pid_cronjob,SIGCONT);
 	}
 	free(tokens); // 			Free up the memory
 	free(line);

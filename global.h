@@ -71,6 +71,8 @@ ll nikal;
 ll naam;
 ll iskokar ;
 ll lekarle;
+ll iscronjob;
+pid_t pid_cronjob;
 pid_t pid_of_shell;
 pid_t parentid ;
 int shellid;

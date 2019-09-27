@@ -19,25 +19,13 @@ void ctrlccross()
 
 void ctrlzcross()
 {
-	printf("Caught signal %ld\n",getpid());
-	pid_t pid = getpid();
-	if( (pid != shellid ) )
-	{
-		printf("Rara\n");
-		return;
-	}		
-	else if(parentid>0)
-	{
-		pid = parentid;
-		procaarray[bgind] = parentid;	
-		gidarray[bgind] = getpgid(parentid);
-		strcpy(characterarray[pid],curr_command);
-		printf("%lld+\tStopped\t%s\n",bgind+1,curr_command);
-		bgind++;
-		updatejobs();
-	}	
 	nikal = 1;
 	signal(SIGTSTP,ctrlzcross);
+}
+
+void sigquit()
+{
+	signal(SIGQUIT,sigquit);	
 }
 
 void signal_handler()

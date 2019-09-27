@@ -8,7 +8,8 @@ void vcsh_cronjob(char *argv[]){
 	ll pind = 0;
 	ll tind = 0;
 	ll prod = 1;
-	if(strcmp(argv[1],"-c")){
+	if(strcmp(argv[1],"-c"))
+	{
 		printf("Please provide the correct format for flags\n");
 		return ;
 	}
