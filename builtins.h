@@ -253,7 +253,7 @@ void echo_vcsh(ll argc, char *argv[])
 
 void quit()
 {
-	printf("Mai yahan aaya%d\n",getpid());
+	printf(" Thank you for using my-shell  👋 %d\n",getpid());
 	exit(0);
 }
 

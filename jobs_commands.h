@@ -24,7 +24,7 @@ void fg(char **tokens)
 		printf("Please provide all arguments\n");
 		og = 1;
 	}
-	printf("eji oji lo ji suno ji %lld\n",og);
+	//printf("eji oji lo ji suno ji %lld\n",og);
 	ll jno ;
 	if(!og)
 	{
@@ -34,7 +34,7 @@ void fg(char **tokens)
 	{
 		jno = bgind - 1;	
 	}
-	printf("%lld %s is the job number put into forefround\n",jno,characterarray[procaarray[jno]]);
+	//printf("%lld %s is the job number put into forefround\n",jno,characterarray[procaarray[jno]]);
 	if(jno >= bgind)
 	{
 		printf("Please provide correct job number\n");
@@ -99,7 +99,7 @@ void fg(char **tokens)
 
 	printf("Gave stdout to process\n");
 	*/
-	printf("%ld ko bulaya\n",pid);
+	//printf("%ld ko bulaya\n",pid);
 	int status;
 	do
 	{
@@ -108,16 +108,16 @@ void fg(char **tokens)
 	while(!WIFEXITED(status) && !WIFSIGNALED(status) && !nikal );
 	if(WIFEXITED(status))
 	{
-		printf("Lo\n");
+		printf("%ld process exited normally\n",pid);
 	}
 	else if(WIFSIGNALED(status))
 	{
-		printf("Fo\n");
+		printf("%ld process exited with signal\n",pid);
 	}
 	else if(nikal == 1)
 	{
 		// Again given Ctrl+Z command
-		printf("olo\n");
+		printf("%ld+\tStopped\t%s\n",bgind,characterarray[pid]);
 		procaarray[bgind] = pid;
 		strcpy(characterarray[bgind],temp);
 		bgind++;

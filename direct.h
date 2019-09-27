@@ -44,7 +44,7 @@ ll shell_loop()
 	for(ll y=0;y<15;y++){
 		HISTORYY[y+o-1] = copystring[y];
 	}
-	printf("*******  Welcome to vcsh  \u263A  ***************\n");
+	printf("*******  Welcome to vcsh ☺️  ***************\n");
 	signal(SIGCHLD, signal_handler);
 	signal(SIGINT,ctrlccross);
 	signal(SIGTSTP,ctrlzcross);		

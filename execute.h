@@ -108,6 +108,81 @@ void parse_it(char *argv)
 		return;
 	}
 	int status;
+
+	// check read file for any spaces 
+	ind = 0;
+	start = 0;
+	while(tot[1][ind]==' ')
+	{
+		ind++;
+	}
+	start = ind;
+	while(ind < strlen(tot[1]) && tot[1][ind]!=' ')
+	{
+		ind++;
+	}
+	char temp[3000];
+	for(ll k=start;k<ind;k++)
+	{
+		temp[k-start] = tot[1][k];
+	}
+	temp[ind-start] = '\0';
+	ll chk = 0;
+	for(ll p=ind;p<strlen(tot[1]);p++)
+	{
+		if(tot[1][p]!=' ')
+		{
+			chk = 1;	
+		}
+	}
+	if(chk == 1)
+	{
+		printf("Please input the correct name of file\n");
+		return ;
+	}
+	for(ll h=0;h<strlen(temp);h++)
+	{
+		tot[1][h] = temp[h];
+	}
+	tot[1][strlen(temp)] = '\0';
+
+	// check write file for any spaces
+	ind = 0;
+        while(tot[2][ind]==' ')
+        {
+                ind++;
+        }
+        while(ind < strlen(tot[2]) && tot[2][ind] != ' ')
+        {
+                ind++;
+        }
+	char temp2[3000];
+        for(ll k=start;k<ind;k++)
+        {
+                temp2[k-start] = tot[2][k];
+        }
+        temp2[ind-start] = '\0';
+        chk = 0;
+        for(ll p=ind;p<strlen(tot[2]);p++)
+        {
+                if(tot[2][p]!=' ')
+                {
+                        chk = 1;
+                }
+        }
+	if(chk == 1)
+	{
+		printf("Please provide correct name of file\n");
+		return ;
+	}
+	for(ll h=0;h<strlen(temp2);h++)
+        {
+                tot[2][h] = temp2[h];
+        }
+        tot[2][strlen(temp2)] = '\0';
+
+
+
 	pid_t pid = fork();
 	if(pid<0){perror("Forking error\n");}
 	if(pid==0)
@@ -121,12 +196,14 @@ void parse_it(char *argv)
 				if(fd2<0)
 				{
 					perror("Can't open\n");
+					exit(0);
 				}
 
 				int fd3 = open(tot[2],O_WRONLY|O_APPEND|O_CREAT,0644); 		// Write to here
 				if(fd3<0)
 				{
 					perror("Can't open\n");
+					exit(0);
 				}
 
 				// Now redirect stdin of first command such that it reads from fd2 and appends to fd3
@@ -142,12 +219,14 @@ void parse_it(char *argv)
 				if(fd2<0)
 				{
 					perror("Can't open\n");
+					exit(0);
 				}
 
 				int fd3 = open(tot[2],O_WRONLY|O_TRUNC |O_CREAT,0644);                 // Write to here
 				if(fd3<0)
 				{
 					perror("Can't open\n");
+					exit(0);
 				}
 
 
@@ -166,6 +245,7 @@ void parse_it(char *argv)
 			if(fd2<0)
 			{
 				perror("Cant open\n");
+				exit(0);
 			}
 
 			// Now redirect stdin of first command such that it reads from fd2 and appends to fd3
@@ -182,6 +262,7 @@ void parse_it(char *argv)
 				if(fd3<0)
 				{
 					perror("Can't open\n");
+					exit(0);
 				}
 				dup2(fd3,1);
 				close(fd3);
@@ -193,6 +274,7 @@ void parse_it(char *argv)
 				if(fd3<0)
 				{
 					perror("Can't open\n");
+					exit(0);
 				}
 				dup2(fd3,1);
 				close(fd3);
@@ -264,7 +346,7 @@ void redirect(char *argv)
 	{
 		set_env(tokens);
 	}
-	else if(!strcmp(tokens[n],"unset"))
+	else if(!strcmp(tokens[n],"unsetenv"))
 	{
 		unset(tokens);
 	}
@@ -425,7 +507,6 @@ void redirect(char *argv)
 					pid_t pid = getpid();
 					if( (pid != shellid ) )
 					{
-						printf("Rara\n");
 						return;
 					}
 					else if(parentid>0)
@@ -434,7 +515,7 @@ void redirect(char *argv)
 						procaarray[bgind] = parentid;
 						gidarray[bgind] = getpgid(parentid);
 						strcpy(characterarray[pid],curr_command);
-						printf("%lld+\tStopped\t%s\n",bgind+1,curr_command);
+						printf("%lld+\tStopped\t%s\n",bgind,curr_command);
 						bgind++;
 						updatejobs();
 					}
@@ -458,7 +539,7 @@ void redirect(char *argv)
 				signal(SIGINT,SIG_DFL);
 				//setpgid(0, 0);
 				signal(SIGTSTP,ctrlzcross);		
-				printf("Mai hun child meri pid hai %ld\n",getpid());
+			//	printf("Mai hun child meri pid hai %ld\n",getpid());
 				if (!strcmp(tokens[n], "ls"))
 				{
 					ls_vcsh(i - 1, tokens); // 				execute ls
