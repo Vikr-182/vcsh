@@ -40,14 +40,15 @@ void fg(char **tokens)
 		printf("Please provide correct job number\n");
 		return;
 	}
+
+	pid_t pid = procaarray[jno];
+	char temp[300000];
+	strcpy(temp,characterarray[jno]);
 	for(ll t=jno;t<bgind-1;t++)
 	{
 		procaarray[t] = procaarray[t+1];
 	}
 	bgind--;
-	pid_t pid = procaarray[jno];
-	char temp[300000];
-	strcpy(temp,characterarray[jno]);
 
 	/* Capture the terminal attributes in a struct termios file */
 	

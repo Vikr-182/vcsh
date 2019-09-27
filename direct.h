@@ -151,7 +151,6 @@ ll shell_loop()
 			resize();
 		}
 		pressedkey = 0;
-
 		nikal = 0;
 		iscronjob = 0;
 	}

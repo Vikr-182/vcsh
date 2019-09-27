@@ -533,7 +533,6 @@ void redirect(char *argv)
 			}
 		}
 	}
-	printf("Rara %ld\n",pid_cronjob);
 	if(iscronjob)
 	{
 		kill(pid_cronjob,SIGCONT);
