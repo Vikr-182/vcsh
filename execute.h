@@ -8,17 +8,39 @@ void removefromloop()
 void parse_it(char *argv)
 {
 	char **tot = (char **)malloc(sizeof(char *)*512);
+	if(!tot)
+	{
+		perror("Malloc error");
+		exit(0);
+	}
 	for(ll k=0;k<200;k++)
 	{
 		tot[k] = (char *)malloc(sizeof(char)*100);
+		if(!tot[k])
+		{
+			perror("Malloc2 error");
+			exit(0);
+		}
 	}
 	ll start = 0;
 	ll end = 0;
 	ll ind = 0;
 	char ** er = (char **)malloc(sizeof(char *)*512);
+	if(!er)
+	{
+		perror("Malloc error");
+		exit(0);
+	}
+
 	for(ll k=0;k<200;k++)
 	{
 		er[k] = (char *)malloc(sizeof(char )*100);
+		if(!er[k])
+		{
+			perror("Malloc error");
+			exit(0);
+		}
+
 	}
 	ll di = 0;
 	ll op = 0;
@@ -29,6 +51,12 @@ void parse_it(char *argv)
 			op = 43;        // Random arbitary number
 			end = ind-1;
 			er[di] = (char *)malloc(sizeof(char )*100);
+			if(!er[di])
+			{
+				perror("Malloc error");
+				exit(0);
+			}
+
 			for(ll i=start;i<=end;i++)
 			{
 				er[di][i-start] = argv[i];
@@ -43,6 +71,12 @@ void parse_it(char *argv)
 			op = 45;        // Random arbitary number
 			end = ind-1;
 			er[di] = (char *)malloc(sizeof(char )*100);
+			if(!er[di])
+                        {
+                                perror("Malloc error");
+                                exit(0);
+                        }
+
 			for(ll i=start;i<=end;i++)
 			{
 				er[di][i-start] = argv[i];
@@ -79,6 +113,12 @@ void parse_it(char *argv)
 				lt_exists = 1;
 				end = o-1;
 				tot[tin] = (char *)malloc(sizeof(char )*100);
+				                   if(!tot[tin])
+                        {
+                                perror("Malloc error");
+                                exit(0);
+                        }
+
 				for(ll b=start;b<=end;b++)
 				{
 					tot[tin][b-start] = er[f][b];
@@ -94,6 +134,12 @@ void parse_it(char *argv)
 		}
 		end = strlen(er[f])-1;
 		tot[tin] = (char *)malloc(sizeof(char )*100);
+		if(!tot[tin])
+		{
+			perror("Malloc error");
+			exit(0);
+		}
+
 		for(ll b=start;b<=end;b++)
 		{
 			tot[tin][b-start] = er[f][b];
@@ -148,38 +194,38 @@ void parse_it(char *argv)
 
 	// check write file for any spaces
 	ind = 0;
-        while(tot[2][ind]==' ')
-        {
-                ind++;
-        }
-        while(ind < strlen(tot[2]) && tot[2][ind] != ' ')
-        {
-                ind++;
-        }
+	while(tot[2][ind]==' ')
+	{
+		ind++;
+	}
+	while(ind < strlen(tot[2]) && tot[2][ind] != ' ')
+	{
+		ind++;
+	}
 	char temp2[3000];
-        for(ll k=start;k<ind;k++)
-        {
-                temp2[k-start] = tot[2][k];
-        }
-        temp2[ind-start] = '\0';
-        chk = 0;
-        for(ll p=ind;p<strlen(tot[2]);p++)
-        {
-                if(tot[2][p]!=' ')
-                {
-                        chk = 1;
-                }
-        }
+	for(ll k=start;k<ind;k++)
+	{
+		temp2[k-start] = tot[2][k];
+	}
+	temp2[ind-start] = '\0';
+	chk = 0;
+	for(ll p=ind;p<strlen(tot[2]);p++)
+	{
+		if(tot[2][p]!=' ')
+		{
+			chk = 1;
+		}
+	}
 	if(chk == 1)
 	{
 		printf("Please provide correct name of file\n");
 		return ;
 	}
 	for(ll h=0;h<strlen(temp2);h++)
-        {
-                tot[2][h] = temp2[h];
-        }
-        tot[2][strlen(temp2)] = '\0';
+	{
+		tot[2][h] = temp2[h];
+	}
+	tot[2][strlen(temp2)] = '\0';
 
 
 
@@ -297,11 +343,23 @@ void redirect(char *argv)
 	}
 
 	char **tokens = (char **)malloc(sizeof(char *) * MAX_TOKENS);
+	if(!tokens)
+	{
+                                perror("Malloc error");
+                                exit(0);
+	}
+
 	for (ll o = 0; o < MAX_TOKENS; o++)
 	{
 		tokens[o] = NULL;
 	}
 	char *line = (char *)malloc(sizeof(char) * (MAX_TOKENS));
+	                   if(!line)
+                        {
+                                perror("Malloc error");
+                                exit(0);
+                        }
+
 	line = strtok(argv, " ");
 	ll i = 0;
 	while (line != NULL)
@@ -316,6 +374,11 @@ void redirect(char *argv)
 	if (!strcmp(tokens[n], "vcsh"))							//			invoking shell
 	{
 		tokens[n] = (char *)malloc(sizeof(char) * 10);
+		if(!tokens[n])
+		{
+			perror("Malloc error");
+			exit(0);	
+		}
 		strcpy(tokens[n], "./a.out"); 
 	}
 	if (!strcmp(tokens[n], "cd"))							// 			execute cd
@@ -381,14 +444,14 @@ void redirect(char *argv)
 			printf("Please provide correct job number\n");
 			return ;
 		}
-		 ll sig = 0;
-                p = 1;
-                for(ll j=0;j<strlen(tokens[2]);j++)
-                {
-                        sig += p*(tokens[2][strlen(tokens[2])-1-j]-'0');
+		ll sig = 0;
+		p = 1;
+		for(ll j=0;j<strlen(tokens[2]);j++)
+		{
+			sig += p*(tokens[2][strlen(tokens[2])-1-j]-'0');
 			p *= 10;
-                }
-                printf("Got sig as %lld\n",sig);
+		}
+		printf("Got sig as %lld\n",sig);
 		kill_job(jno,sig);
 	}
 	else if(!(strcmp(tokens[n],"overkill")))
@@ -430,7 +493,7 @@ void redirect(char *argv)
 		{
 			argv[find] = '\0';
 		}
-		
+
 		if (askedinbg)
 		{
 			for (ll j = findind; j < i; j++)
@@ -539,7 +602,7 @@ void redirect(char *argv)
 				signal(SIGINT,SIG_DFL);
 				//setpgid(0, 0);
 				signal(SIGTSTP,ctrlzcross);		
-			//	printf("Mai hun child meri pid hai %ld\n",getpid());
+				//	printf("Mai hun child meri pid hai %ld\n",getpid());
 				if (!strcmp(tokens[n], "ls"))
 				{
 					ls_vcsh(i - 1, tokens); // 				execute ls
@@ -610,6 +673,10 @@ void redirect(char *argv)
 				strcpy(characterarray[pid], argv);
 				int status;
 				kill(pid,SIGTTIN);				
+				if(!strcmp(tokens[0],"sleep") )
+				{
+					kill(pid,SIGCONT);
+				}
 				printf("Done %lld\n",bgind-1);
 			}
 		}

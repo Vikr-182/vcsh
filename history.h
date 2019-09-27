@@ -9,6 +9,12 @@ void resize()
         return;
     }
     char **tokens = (char **)malloc(sizeof(char *) * MAX_COMMANDS);
+                       if(!tokens)
+                        {
+                                perror("Malloc error");
+                                exit(0);
+                        }
+
     for (ll o = 0; o < MAX_COMMANDS; o++)
     {
         tokens[o] = NULL;
@@ -20,6 +26,12 @@ void resize()
     while (a != -1)
     {
         tokens[i] = (char *)malloc(sizeof(char)*BUFFER_SIZE);
+	                   if(!tokens[i])
+                        {
+                                perror("Malloc error");
+                                exit(0);
+                        }
+
         strcpy(tokens[i++], u);
         a = getline(&u, &len, fd);
     }
@@ -69,11 +81,23 @@ void history_vcsh(int argc, char *argv, ll flag)
         }
 
         char **tokens = (char **)malloc(sizeof(char *) * MAX_COMMANDS);
+	                   if(!tokens)
+                        {
+                                perror("Malloc error");
+                                exit(0);
+                        }
+
         for (ll o = 0; o < MAX_TOKENS; o++)
         {
             tokens[o] = NULL;
         }
         char *line = (char *)malloc(sizeof(char) * (MAX_COMMANDS));
+	                   if(!line)
+                        {
+                                perror("Malloc error");
+                                exit(0);
+                        }
+
         line = strtok(argv, " ");
         ll i = 0;
         while (line != NULL)

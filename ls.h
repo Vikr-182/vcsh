@@ -119,6 +119,12 @@ void ls_vcsh(int argc, char *argv[])
 		printf("\nPlease provide only 2 paths\n");
 	}
 	char *path = (char *)malloc(sizeof(char) * BUFFER_SIZE);
+	                   if(!path)
+                        {
+                                perror("Malloc error");
+                                exit(0);
+                        }
+
 	if (f)
 	{
 		//No path provided ls in current working directory

@@ -100,12 +100,17 @@ void fg(char **tokens)
 	printf("Gave stdout to process\n");
 	*/
 	//printf("%ld ko bulaya\n",pid);
+	//printf("Aaya\n");
+	//signal(SIGTTIN,SIG_IGN);
+	//signal(SIGTTOU,SIG_IGN);
 	int status;
 	do
 	{
 		waitpid(pid,&status,WUNTRACED);
 	}
 	while(!WIFEXITED(status) && !WIFSIGNALED(status) && !nikal );
+	//waitpid(-1,NULL,WUNTRACED);
+	
 	if(WIFEXITED(status))
 	{
 		printf("%ld process exited normally\n",pid);
