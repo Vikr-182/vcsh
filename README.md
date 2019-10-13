@@ -1,15 +1,32 @@
 # vcsh
 A basic shell in C
 
-## Instructions to run the shell
+## Instructions for installation
 - Download the file as a zip or use the following command <br/>
 `$ git clone https://github.com/Vikr-182/vcsh `
-- Inside the directory run the following instructions <br/>
+- Inside the directory run  <br/>
 `$ make   ` 
 
-`$ ./Shell`
+     `$ ./Shell`
 - To clean the object files, use <br/> 
 `$ make clean`
+
+## File stucture 
+- _builtins.h_ implements builtin commands like `cd`,`pwd`,`quit` and `echo`.
+- _cronjob.h_ implements `cronjob` command
+- _direct.h_ contains the shell loop and initalisation as well as piping.
+- _execute.h_ parses the string to check redirection and executes the command.
+- _env.h_ implements `setenv` and `unsetenv`
+- _history.h_ has history-related commands like `history` and for resizing.
+- _input.h_ takes the user input . It also checks if up arrow key was pressed or not.
+- _jobs_\_ _commands.h_ implements functions like `fg`,`bg` and `kjob`.
+- _jobs.h_ contains signal handlers for Ctrl+Z and Ctrl+C as well as _SIGCHLD_ handler. In addition, it contains _updatejobs_ and _showjobs_ which update and display the list respectively.
+- _ls.h_ implements the `ls` command.
+- _main.c_ just contains the welcome message and call to the loop
+- _nightswatch.h_ contains `nightswatch` implementation.
+- _pinfo.h_ has `pinfo` implemented.
+- _prompt.h_ displays the prompt.
+- Finally _global.h_ contains the variables shared across the files.
 
 ## Commands implemented
 - `cd`
@@ -102,20 +119,3 @@ A basic shell in C
 #### `cronjob -c <command> -t <time-period> -p <total-time>`
 - Takes input a single word command which will execute after _time-period_ interval until _total-time_.
 - Treated as background process.
-
-## File stucture 
-- _builtins.h_ implements builtin commands like `cd`,`pwd`,`quit` and `echo`.
-- _cronjob.h_ implements `cronjob` command
-- _direct.h_ contains the shell loop and initalisation as well as piping.
-- _execute.h_ parses the string to check redirection and executes the command.
-- _env.h_ implements `setenv` and `unsetenv`
-- _history.h_ has history-related commands like `history` and for resizing.
-- _input.h_ takes the user input . It also checks if up arrow key was pressed or not.
-- _jobs_\_ _commands.h_ implements functions like `fg`,`bg` and `kjob`.
-- _jobs.h_ contains signal handlers for Ctrl+Z and Ctrl+C as well as _SIGCHLD_ handler. In addition, it contains _updatejobs_ and _showjobs_ which update and display the list respectively.
-- _ls.h_ implements the `ls` command.
-- _main.c_ just contains the welcome message and call to the loop
-- _nightswatch.h_ contains `nightswatch` implementation.
-- _pinfo.h_ has `pinfo` implemented.
-- _prompt.h_ displays the prompt.
-- Finally _global.h_ contains the variables shared across the files.
