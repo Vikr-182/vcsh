@@ -3,7 +3,7 @@ A basic shell in C
 
 ## Instructionss to run the shell
 - Download the file as a zip or use the following command <br/>
-`git clone `
+`git clone https://github.com/Vikr-182/vcsh `
 - Inside the directory run the following instructions <br/>
 `make`<br/>
 `./Shell`
