@@ -12,14 +12,19 @@ A basic shell in C
 `$ make clean`
 
 ## File stucture 
-- _builtins.h_ implements builtin commands like `cd`,`pwd`,`quit` and `echo`.
-- _cronjob.h_ implements `cronjob` command
-- _direct.h_ contains the shell loop and initalisation as well as piping.
-- _execute.h_ parses the string to check redirection and executes the command.
-- _env.h_ implements `setenv` and `unsetenv`
-- _history.h_ has history-related commands like `history` and for resizing.
-- _input.h_ takes the user input . It also checks if up arrow key was pressed or not.
-- _jobs_\_ _commands.h_ implements functions like `fg`,`bg` and `kjob`.
+
+
+    .
+    ├── builtins.h          #implements builtin commands like cd,pwd,quit and echo. 
+    ├── cronjob.h           #implements cronjob command
+    ├── direct.h            #contains the shell loop and initalisation as well as piping.
+    ├── execute.h           #parses the string to check redirection and executes the command.
+    ├── env.h               #implements setenv and unsetenv
+    ├── history.h           #has history-related commands like history and for resizing.
+    └── input.h_            #takes the user input . It also checks if up arrow key was pressed or not.
+    └── jobs_commands.h     #implements functions like fg,bg and kjob.
+
+- 
 - _jobs.h_ contains signal handlers for Ctrl+Z and Ctrl+C as well as _SIGCHLD_ handler. In addition, it contains _updatejobs_ and _showjobs_ which update and display the list respectively.
 - _ls.h_ implements the `ls` command.
 - _main.c_ just contains the welcome message and call to the loop
