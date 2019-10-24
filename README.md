@@ -31,69 +31,69 @@ A basic shell in C
     ├── global.h            # contains the variables shared across the files.
 
 ## Commands implemented
-##### `cd`
+##### -`cd`
 - Changes directory using _chdir_
 - Keeps a track of previous directory whenever changing to another directory to take care of `cd -`
 
-##### `ls`
+##### -`ls`
 - Implements `ls -[la]` in all different ways.
 - If a directory is specified, the contents of that directory are obtained using _readdir_ command which returns a struct which is passed as argument to _stat_ function to obtain other information
 - Appropriate color scheme is used for files, directories, links etc.
 
-##### `pwd`
+##### -`pwd`
 - Uses the command _getcwd_ .
 - Error handling is done if size too big.
 
-##### `echo`
+##### -`echo`
 - First -n flag is looked whether to output the trailing newline.
 - Across the traversal, _$_ is searched for to check presence of any environment variables.
 - Also, string inside _" "_ will be printed as it is. It is checked via keeping a start and end pointer for the opening and closing positions. If not closed, error is shown up.
 
-##### `pinfo`
+##### -`pinfo`
 - Only requires pid or null as argument. Error handling is done in case not done in such a way.
 - All information regarding the process is obtained in various files located inside _/proc/pid_ .
 
-##### `nightswatch`
+##### -`nightswatch`
 - ncurses library is used to implement it/
 
-##### `history <num>`
+##### -`history <num>`
 - A file ".vcsh\_history" keeps track of all commands typed. 
 - _resize_ checks the number of commands entered till now. If it is greater than 25, the history file is resized by taking the most recent commands
 - Prints the last num commands typed. If num not entered , prints the last 10 commands by default.
 
-##### `setenv <variable> <value>`
+##### -`setenv <variable> <value>`
 - Only accepts name of environment variable and value as input. Error handling is done otherwise.
 - The variable is set using _setenv_ command. If not able to set, error message shows up.
 
-##### `unsetenv <variable>`
+##### -`unsetenv <variable>`
 - Takes only name of variable to be unset, error shown otherwise. 
 - Unset using _unset_ command, error shown if not able to.
 
-##### `fg <jobnumber>`
+##### -`fg <jobnumber>`
 - The process\-id is retrieved using the _procaarray_.If no job number is specified, most recent process is taken into consideration.
 - a _SIGCONT_ signal is given to the process and the shell is made to wait for the child using _waitpid_.  Ctrl+Z in the process is also handled.
 - tcsetpgrp is used to give control to the child process.
 
-##### `bg <jobnumber>`
+##### -`bg <jobnumber>`
 - The process\-id is retrieved using the _procaarray_.
 - _SIGCONT_ is given to the the process using kill command.
 
-##### `overkill`
+##### -`overkill`
 - Takes no arguments. Error shown otherwise.
 - Iterates over the process array, keeps giving _SIGINT_ signal until each one of them killed.
 
-##### `kjob <jobnumber> <signalnumber>`
+##### -`kjob <jobnumber> <signalnumber>`
 - Takes input the job number and signal number. If no such job number exists or signal is invalid, error is thrown up.
 - Identifes the process from job number through the procaarray list.
 
-##### `jobs`
+##### -`jobs`
 - Prints the list of background jobs along with their status.
 - Prints error if any argument given
 
-##### `quit`
+##### -`quit`
 - Will make the shell quit.
 
-##### `cronjob -c <command> -t <time-period> -p <total-time>`
+##### -`cronjob -c <command> -t <time-period> -p <total-time>`
 - Takes input a single word command which will execute after _time-period_ interval until _total-time_.
 - Treated as background process.
 
