@@ -13,19 +13,19 @@ A basic shell in C
 
 ## File stucture 
     .
-    ├── builtins.h          # implements builtin commands like cd,pwd,quit and echo. 
-    ├── cronjob.h           # implements cronjob command
+    ├── builtins.h          # implements builtin commands like `cd`,`pwd`,`quit` and `echo`. 
+    ├── cronjob.h           # implements `cronjob` command
     ├── direct.h            # contains the shell loop and initalisation as well as piping.
     ├── execute.h           # parses the string to check redirection and executes the command.
-    ├── env.h               # implements setenv and unsetenv
-    ├── history.h           # has history-related commands like history and for resizing.
+    ├── env.h               # implements `setenv` and `unsetenv`
+    ├── history.h           # has history-related commands like `history` and for resizing.
     ├── input.h_            # takes the user input . It also checks if up arrow key was pressed or not.
-    ├── jobs_commands.h     # implements functions like fg,bg and kjob.
-    ├── jobs.h              # contains signal handlers for Ctrl+Z and Ctrl+C as well as SIGCHLD handler. 
+    ├── jobs_commands.h     # implements functions like `fg`,`bg` and `kjob`.
+    ├── jobs.h              # contains signal handlers for 'Ctrl+Z' and 'Ctrl+C' as well as 'SIGCHLD' handler. 
     ├                       # In addition, it contains updatejobs and showjobs which update and display the list respectively.
-    ├── ls.h                # implements the ls command.
+    ├── ls.h                # implements the `ls` command.
     ├── main.c              # contains the welcome message and call to the loop
-    ├── nightswatch.h       # contains nightswatch implementation.
+    ├── nightswatch.h       # contains `nightswatch` implementation.
     ├── pinfo.h             # has `pinfo` implemented.
     ├── prompt.h            # displays the prompt.
     ├── global.h            # contains the variables shared across the files.
