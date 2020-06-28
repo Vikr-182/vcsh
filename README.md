@@ -3,13 +3,18 @@ A basic shell in C
 
 ## Installation Instructions
 - Download the file as a zip or use the following command <br/>
-`$ git clone https://github.com/Vikr-182/vcsh `
+```
+$: git clone https://github.com/Vikr-182/vcsh 
+```
 - Inside the directory run  <br/>
-`$ make   ` 
-
-     `$ ./Shell`
+```
+$: make
+$: ./Shell
+ ```
 - To clean the object files, use <br/> 
-`$ make clean`
+```
+$ make clean
+```
 
 ## File stucture 
     .
