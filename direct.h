@@ -3,7 +3,7 @@
 #include "prompt.h"
 #include "input.h"
 #include "builtins.h"
-#include "clear.h"
+//#include "clear.h"
 #include "history.h"
 #include "pinfo.h"
 #include "jobs.h"
